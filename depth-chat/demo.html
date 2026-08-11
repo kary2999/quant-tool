@@ -44,6 +44,16 @@
   <a class="btn btn-ghost" href="../">返回 quant-visual-tools 首页</a>
 </div>
 
+<div class="warn">
+  <strong>打开方式很重要：</strong>
+  用 <code>file://</code> 双击打开时，浏览器把页面 origin 视为 <code>null</code>，
+  <em>既不能 fetch 本地 JSON，也不能请求测试环境</em>（全部被 CORS 拦）。
+  此时页面自动选中 <strong>Mock 本地</strong>，数据来自打包好的 <code>js/mock-data.js</code>，图表可正常演示；
+  但下拉切到「测试环境」必然失败。<br>
+  要连测试环境，请起本地服务器：在 <code>quant-visual-tools</code> 目录执行 <code>./start.sh</code> →
+  访问 <code>http://localhost:8080/depth-chat/depth-chat.html</code>。
+</div>
+
 <h2>1. 配置变量 <code>api_base</code></h2>
 <p>配置文件：<code>config/api-config.json</code></p>
 
@@ -61,18 +71,22 @@
   可通过 URL 覆盖：<code>?api_base=http://18.177.36.184/futures</code>
 </div>
 
-<h2>2. Mock 开关</h2>
+<h2>2. Mock / 测试环境切换（与 depth-gather 一致）</h2>
 <table>
-  <tr><th>方式</th><th>说明</th></tr>
-  <tr><td><code>?mock=1</code></td><td>推荐。拦截 <code>contract.chishee.com</code> 全部 7 个接口，改读本地 JSON</td></tr>
-  <tr><td><code>config/api-config.json</code></td><td>设置 <code>mock.enabled_by_default: true</code> 默认 mock</td></tr>
-  <tr><td>桥接脚本</td><td><code>js/mock-bridge.js</code> — 在 jQuery 就绪后 patch <code>$.ajax</code></td></tr>
+  <tr><th>位置</th><th>行为</th></tr>
+  <tr><td>顶栏 <code>#market_monitor</code></td><td><strong>Mock 本地</strong> / <strong>测试环境</strong> — 本所深度</td></tr>
+  <tr><td>顶栏 <code>#market_kline</code></td><td>同上 — K 线（与本所深度同步切换）</td></tr>
+  <tr><td>切换任一下拉</td><td>立即刷新 depth / kline / exchangeInfo / 牌价 / 对标价等本所接口</td></tr>
+  <tr><td><code>?mock=1</code></td><td>仅默认选中 Mock；仍可在下拉切回测试环境</td></tr>
+  <tr><td><code>http://</code> 无参数打开</td><td>默认测试环境</td></tr>
+  <tr><td><code>file://</code> 打开</td><td>默认 Mock（真接口在此协议下必被 CORS 拦），顶栏横幅会提示</td></tr>
 </table>
-
 <div class="note">
-  <strong>Mock 覆盖范围（<code>contract.chishee.com</code> 全部 7 个接口）：</strong>
-  详见 <code>data/mock/mock.json</code> 索引文件。
+  Mock 与测试环境<strong>始终并列</strong>；Mock 模式下本所 7 个接口走 <code>data/mock/</code>，测试环境走 <code>api_base</code>。
+  币安深度等外网接口不受此项控制。
 </div>
+
+<h2>3. Mock 接口清单</h2>
 <table>
   <tr><th>接口</th><th>Mock 文件</th><th>说明</th></tr>
   <tr><td><code>GET /pub/exchangeInfo</code></td><td><code>exchangeInfo.json</code></td><td>交易对配置，填充下拉框</td></tr>
@@ -87,7 +101,7 @@
   <strong>注意：</strong>币安深度等外网接口不在 mock 范围；离线演示时该区块可能为空，属预期行为。
 </div>
 
-<h2>3. Mock 文件命名</h2>
+<h2>4. Mock 文件命名</h2>
 <p>目录：<code>data/mock/</code></p>
 <table>
   <tr><th>接口</th><th>文件规则</th><th>回退</th></tr>
@@ -135,7 +149,7 @@
   <li><code>1000003</code> — TRXUSDT（<code>depth.symbol-1000003.json</code>，与截图交易对一致）</li>
 </ul>
 
-<h2>4. 响应外壳（统一）</h2>
+<h2>5. 响应外壳（统一）</h2>
 <p>与线上一致，前端读 <code>json.data</code>：</p>
 <pre>{
   "code": 0,
@@ -143,7 +157,7 @@
   "data": { ... }
 }</pre>
 
-<h2>5. <code>/debug/depth</code> 数据结构</h2>
+<h2>6. <code>/debug/depth</code> 数据结构</h2>
 <p>来源：<code>smoneyfuturesservice/script/src/Controller/Debug/Depth.php::index()</code></p>
 
 <h3>5.1 <code>data.stats</code> — 顶栏指标</h3>
@@ -190,7 +204,7 @@
 <h3>5.4 <code>data.depth_analyze</code></h3>
 <p>HTML 字符串，深度图 tooltip 展示，格式：<code>_{百分比} : {买量} / {卖量} &lt;br/&gt;</code></p>
 
-<h2>6. <code>/debug/klineDiff</code> 数据结构</h2>
+<h2>7. <code>/debug/klineDiff</code> 数据结构</h2>
 <p>来源：<code>Debug/Index.php::klineDiff()</code> + <code>KlineLogic::kline()</code></p>
 <p>请求参数（页面固定拼法）：</p>
 <pre>?symbol_id=1000003&amp;resolution=1&amp;size=1000&amp;from={unix}&amp;to={unix}</pre>
@@ -220,14 +234,15 @@
   展开 K 线面板后每 5s 拉取一次。
 </div>
 
-<h2>7. 目录结构</h2>
+<h2>8. 目录结构</h2>
 <pre>depth-chat/
 ├── depth-chat.html          # 主页面（sync + mock hooks）
 ├── demo.html                # 本说明页
 ├── config/api-config.json   # api_base 与 mock 规则
 ├── js/
-│   ├── api-config.js        # 加载配置
-│   └── mock-bridge.js       # ajax 拦截 / 下拉重写
+│   ├── mock-data.js         # 内嵌配置 + 全部 mock（file:// 兜底，脚本生成勿手改）
+│   ├── api-config.js        # 加载配置（file:// 下改读 mock-data.js）
+│   └── mock-bridge.js       # 拦截 jQuery.ajax 与原生 fetch / 下拉重写
 ├── data/mock/
 │   ├── mock.json                 # 接口索引 + 说明
 │   ├── exchangeInfo.json
@@ -242,11 +257,35 @@
 │   ├── klineDiff.default.json
 │   ├── klineDiff.symbol-1000001.json
 │   └── klineDiff.symbol-1000003.json
+├── tools/gen-mock-data.py   # 重新生成 js/mock-data.js
+├── test/
+│   ├── mock-smoke-test.js   # mock 链路冒烟测试（node，DOM 桩）
+│   └── e2e-browser.js       # 浏览器级 e2e（真实 Chrome，需 puppeteer-core）
 └── apply-mock-hooks.sh      # sync 后注入脚本</pre>
 
-<h2>8. 维护</h2>
+<h2>9. 维护</h2>
 <pre># 从 smoneyfuturesservice 同步并重新注入 mock hooks
-cd quant-visual-tools && ./sync.sh</pre>
+cd quant-visual-tools && ./sync.sh
+
+# 改过 data/mock/*.json 或 config/api-config.json 后，必须重新打包 file:// 兜底数据
+cd depth-chat && python3 tools/gen-mock-data.py
+
+# 验证 mock 链路（file:// 与 http:// 两种场景，无需浏览器）
+cd depth-chat && node test/mock-smoke-test.js
+
+# 浏览器级 e2e（真实 Chrome，查脚本时序 / 渲染 / 请求泄漏）
+./start.sh 8123                      # 另开终端
+npm i puppeteer-core                 # 一次性
+cd depth-chat && PORT=8123 node test/e2e-browser.js</pre>
+<div class="note">
+  两个测试覆盖面不同：<code>mock-smoke-test.js</code> 用 DOM 桩验数据链路，快；
+  <code>e2e-browser.js</code> 跑真实 Chrome，能抓到<strong>脚本加载时序</strong>问题——
+  比如 mock 补丁装晚了导致首个 <code>exchangeInfo</code> 漏到生产域名，这类 bug 桩测试结构上测不出来。
+</div>
+<div class="warn">
+  忘记跑 <code>gen-mock-data.py</code> 的后果：<code>http://</code> 下看到新数据，<code>file://</code> 下还是旧数据，
+  两边对不上很难排查。
+</div>
 
 <p style="margin-top:32px;color:var(--dim);font-size:12px;">
   接口实现参考：<code>smoneyfuturesservice/script/src/Controller/Debug/Depth.php</code>、

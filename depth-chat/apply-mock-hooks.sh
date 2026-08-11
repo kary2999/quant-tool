@@ -18,7 +18,8 @@ needle = '<script defer src="https://code.jquery.com/jquery-3.6.4.min.js"'
 insert = '''<script defer src="https://code.jquery.com/jquery-3.6.4.min.js"
             integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
     <!-- quant-visual-tools-mock-hooks: 配置变量 + mock 桥接（sync 后保留） -->
-    <script defer src="config/api-config.js"></script>
+    <script defer src="js/mock-data.js"></script>
+    <script defer src="js/api-config.js"></script>
     <script defer src="js/mock-bridge.js"></script>'''
 # 只替换第一处 jquery 行块
 old = '''    <script defer src="https://code.jquery.com/jquery-3.6.4.min.js"

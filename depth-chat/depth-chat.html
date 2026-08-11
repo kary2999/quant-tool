@@ -10,6 +10,7 @@
     <script defer src="https://code.jquery.com/jquery-3.6.4.min.js"
             integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
     <!-- quant-visual-tools-mock-hooks: 配置变量 + mock 桥接（sync 后保留） -->
+    <script defer src="js/mock-data.js"></script>
     <script defer src="js/api-config.js"></script>
     <script defer src="js/mock-bridge.js"></script>
     <script defer src="https://static.topcreditbank.com/2023/0719/highcharts.js"></script>
@@ -72,6 +73,17 @@
   }
   .logo { font-weight: 700; color: var(--accent); margin-right: 4px; font-size: 13px; letter-spacing: 0.5px; }
   .sep  { width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
+
+  .mock-banner {
+    display: none;
+    padding: 5px 12px;
+    font-size: 11px;
+    background: rgba(240, 136, 62, 0.12);
+    border-bottom: 1px solid rgba(240, 136, 62, 0.35);
+    color: #f0883e;
+    flex-shrink: 0;
+  }
+  .mock-banner code { color: #f0883e; background: rgba(0,0,0,0.2); padding: 1px 4px; border-radius: 3px; }
 
   .ctrl {
     background: var(--bg3);
@@ -1299,15 +1311,15 @@
     <button type="button" class="ctrl sym-apply" id="sym_apply" title="应用当前选中交易对并刷新配置 (Enter)">应用</button>
   </div>
 
-  <select class="ctrl" id="market_monitor" style="width:100px;"
-          title="本所深度接口地址">
-          <option value="http://18.177.36.184/futures/debug/depth" selected>测试环境</option>
-          <!-- <option value="https://contract.chishee.com/debug/depth" selected>生产环境</option> -->
+  <select class="ctrl" id="market_monitor" style="width:110px;"
+          title="本所深度 · Mock 本地 / 测试环境（切换后立即刷新）">
+          <option value="mock://depth" data-mock="1" selected>Mock 本地</option>
+          <option value="http://18.177.36.184/futures/debug/depth" data-mock="0">测试环境</option>
   </select>
-  <select class="ctrl" id="market_kline" style="width:100px;"
-          title="K线接口地址（展开 K 线时使用）">
-          <option value="http://18.177.36.184/futures/debug/klineDiff" selected>测试K线</option>
-          <!-- <option value="https://contract.chishee.com/debug/klineDiff" selected>生产K线</option> -->
+  <select class="ctrl" id="market_kline" style="width:110px;"
+          title="K线 · Mock 本地 / 测试环境（与本所深度同步）">
+          <option value="mock://klineDiff" data-mock="1" selected>Mock 本地</option>
+          <option value="http://18.177.36.184/futures/debug/klineDiff" data-mock="0">测试环境</option>
   </select>
   <select class="ctrl" id="kline_type" style="width:80px;"
           title="K线价格类型：最新成交价 / 标记价">
@@ -1337,6 +1349,11 @@
       <div class="mi danger" data-action="reset-config">重置全部配置</div>
     </div>
   </div>
+</div>
+
+<div id="mock_banner" class="mock-banner">
+  Mock 模式 — 本所接口走 <code>data/mock/*.json</code>（exchangeInfo / depth / kline / 牌价等）。
+  切换「测试环境」即走真接口。说明见 <a href="demo.html" style="color:#58a6ff;">demo.html</a>
 </div>
 
 <!-- ===== 交易对 Meta 条 ===== -->

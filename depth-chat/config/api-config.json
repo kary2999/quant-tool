@@ -33,8 +33,9 @@
     }
   },
   "notes": [
-    "mock=1 时 contract.chishee.com 全部 7 个接口走本地 JSON，详见 data/mock/mock.json",
+    "顶栏下拉 Mock 本地 / 测试环境 动态切换，与 depth-gather 一致",
+    "Mock 时本所 7 个接口走 data/mock/，详见 data/mock/mock.json",
     "未命中 symbol 专用文件时使用 *.default.json",
-    "币安深度等外网接口不在 mock 范围，离线时该区块为空属预期"
+    "币安深度等外网接口不在 mock 范围"
   ]
 }
