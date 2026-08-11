@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多交易所深度对比 · depthCompare</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"
+            integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+            integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+            crossorigin="anonymous"></script>
+    <script src="https://static.topcreditbank.com/2023/0719/highcharts.js"></script>
+    <script src="https://static.topcreditbank.com/2023/0719/exporting.js"></script>
+    <script src="https://static.topcreditbank.com/2023/0719/zh_cn-1.4.0.min.js"></script>
+    <script src="js/mock-data.js"></script>
+    <script src="js/mock-bridge.js"></script>
+    <script src="js/exchange-depth.js"></script>
+
+    <style>
+        :root {
+            --bg: #0d1117;
+            --bg2: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --dim: #8b949e;
+            --ask: #ef4444;
+            --bid: #10b981;
+            --accent: #58a6ff;
+            --warn: #f0883e;
+        }
+        html, body {
+            margin: 0; height: 100%;
+            background: var(--bg); color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 13px;
+        }
+        .page {
+            max-width: 100%; margin: 0 auto; padding: 8px 12px 16px;
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
+        .file-mode-banner {
+            margin: 0 0 10px; padding: 8px 12px; font-size: 12px;
+            background: rgba(240, 136, 62, 0.12);
+            border: 1px solid rgba(240, 136, 62, 0.35);
+            border-radius: 6px; color: var(--warn);
+        }
+        .toolbar {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+            padding: 8px 12px; background: var(--bg2);
+            border: 1px solid var(--border); border-radius: 6px; margin-bottom: 10px;
+        }
+        .toolbar .form-control {
+            height: 30px; background: #1c2333; border-color: var(--border);
+            color: var(--text); font-size: 12px;
+        }
+        .toolbar .btn { height: 30px; font-size: 12px; }
+        .toolbar .btn-refresh-on {
+            background: #238636; border-color: #2ea043; color: #fff;
+        }
+        .red { color: var(--ask); }
+        .green { color: var(--bid); }
+        .blue { color: var(--accent); }
+        .orange { color: var(--warn); }
+        .dim { color: var(--dim); }
+
+        .ex-toggles {
+            display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center;
+            padding: 6px 12px; background: var(--bg2);
+            border: 1px solid var(--border); border-radius: 6px; margin-bottom: 10px;
+            font-size: 12px;
+        }
+        .ex-toggles label {
+            display: inline-flex; align-items: center; gap: 5px;
+            cursor: pointer; margin: 0; user-select: none;
+        }
+        .ex-toggles input { margin: 0; }
+        .ex-dot {
+            width: 10px; height: 10px; border-radius: 2px; display: inline-block;
+        }
+
+        .status-bar {
+            display: flex; flex-wrap: wrap; gap: 8px 16px;
+            padding: 6px 12px; font-size: 11px; color: var(--dim);
+            border: 1px solid var(--border); border-radius: 6px;
+            background: var(--bg2); margin-bottom: 10px;
+        }
+        .status-bar .ex-stat { display: inline-flex; gap: 4px; align-items: center; }
+        .status-bar .ok { color: var(--bid); }
+        .status-bar .err { color: var(--ask); }
+        .status-bar .pending { color: var(--warn); }
+
+        .main-layout {
+            display: flex; flex: 1 1 auto; gap: 10px;
+            align-items: stretch; min-height: 0;
+        }
+        .side-panel {
+            flex: 0 0 clamp(280px, 30vw, 380px);
+            min-width: 260px; max-width: 400px;
+            display: flex; flex-direction: column; gap: 10px;
+            min-height: 480px;
+        }
+        .chart-panel {
+            flex: 1 1 auto; min-width: 0;
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: 6px; overflow: hidden;
+            display: flex; flex-direction: column; min-height: 480px;
+        }
+        .chart-head {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 8px;
+            padding: 8px 12px; border-bottom: 1px solid var(--border);
+            font-size: 12px; color: var(--dim);
+        }
+        .chart-head strong { color: var(--text); font-size: 13px; }
+        #container {
+            flex: 1 1 auto; width: 100%;
+            min-height: 360px; height: 100%;
+        }
+
+        .table-panel {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: 6px; overflow: hidden;
+        }
+        .table-panel .panel-title {
+            padding: 6px 10px; font-size: 12px; font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+        .table-panel table { margin: 0; width: 100%; color: var(--text); }
+        .table-panel th {
+            text-align: center; font-size: 10px; font-weight: 600;
+            background: #1c2333; border-color: var(--border) !important;
+            color: var(--dim); padding: 5px 4px !important;
+        }
+        .table-panel td {
+            text-align: center; font-size: 11px;
+            font-family: 'SF Mono', Consolas, monospace;
+            padding: 4px !important; border-color: var(--border) !important;
+        }
+        .table-scroll { max-height: 220px; overflow: auto; }
+
+        .cmp-table .best-row td { font-weight: 700; }
+        .cmp-table tr:hover td { background: rgba(88, 166, 255, 0.08) !important; }
+
+        @media (max-width: 991px) {
+            .main-layout { flex-direction: column; }
+            .side-panel { flex: none; max-width: 100%; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <div id="mock_banner" class="file-mode-banner" style="display:none;">
+        Mock 模式 — 本所数据来自本地 JSON；外所仍走公网 HTTP。
+    </div>
+
+    <div class="toolbar">
+        <button type="button" onclick="timeGetMarket()" class="btn btn-default" id="timeGetMarket" tag="5" num="0">
+            ↻ 定时刷新
+        </button>
+        <input type="text" id="symbol_id" value="1000001" placeholder="symbol_id"
+               class="form-control" style="width:90px;">
+        <select id="market_monitor" class="form-control" style="width:200px;">
+            <option value="mock://depthGather" data-mock="1">Mock 本所</option>
+            <option value="http://18.177.36.184/futures/debug/depthGather" data-mock="0" selected>测试环境</option>
+        </select>
+        <select id="refresh_ms" class="form-control" style="width:90px;">
+            <option value="1000">1s</option>
+            <option value="2000">2s</option>
+            <option value="3000" selected>3s</option>
+            <option value="5000">5s</option>
+        </select>
+        <button type="button" class="btn btn-primary btn-sm" onclick="getMarketData()">立即刷新</button>
+        <span id="sym_label" class="blue" style="margin-left:4px;">—</span>
+    </div>
+
+    <div class="ex-toggles" id="ex_toggles"></div>
+
+    <div class="status-bar" id="status_bar">
+        <span class="pending">等待首次拉取…</span>
+    </div>
+
+    <div class="main-layout">
+        <aside class="side-panel">
+            <div class="table-panel">
+                <div class="panel-title green">最优价对比 · Best Bid / Ask</div>
+                <div class="table-scroll">
+                    <table class="table table-bordered cmp-table">
+                        <thead>
+                        <tr>
+                            <th>交易所</th>
+                            <th>BP</th>
+                            <th>AP</th>
+                            <th>档数</th>
+                            <th>延迟</th>
+                        </tr>
+                        </thead>
+                        <tbody id="best_cmp_body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="table-panel">
+                <div class="panel-title">本所订单簿 · 卖盘</div>
+                <div class="table-scroll">
+                    <table class="table table-bordered">
+                        <thead><tr><th>Qty</th><th>Price</th></tr></thead>
+                        <tbody id="local_ask_body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="table-panel">
+                <div class="panel-title">本所订单簿 · 买盘</div>
+                <div class="table-scroll">
+                    <table class="table table-bordered">
+                        <thead><tr><th>Price</th><th>Qty</th></tr></thead>
+                        <tbody id="local_bid_body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </aside>
+
+        <section class="chart-panel">
+            <div class="chart-head">
+                <div>
+                    <strong id="chart_title">多交易所深度位置对比</strong>
+                    <span class="dim" id="chart_sub">纵轴=价格 · 横轴=单档量 · 全部响应后统一渲染</span>
+                </div>
+                <span id="batch_info" class="dim">—</span>
+            </div>
+            <div id="container"></div>
+        </section>
+    </div>
+</div>
+
+<script>
+    var timer, timerV2, fetchInFlight = false;
+    var appConfig = null;
+    var visibleExchanges = { local: true, binance: true, okx: true, bybit: true, kucoin: true };
+    var chartSeriesMap = {};
+    var lastBatch = null;
+
+    function getSymCfg() {
+        var sid = $('#symbol_id').val();
+        if (!appConfig || !appConfig.symbols) return { name: sid, binance: 'BTCUSDT', okx: 'BTC-USDT-SWAP', bybit: 'BTCUSDT', kucoin: 'XBTUSDTM', kucoin_multiplier: 0.001, okx_ct_val: 0.01 };
+        return appConfig.symbols[sid] || appConfig.symbols['1000001'];
+    }
+
+    function buildExchangeToggles() {
+        var html = '<span class="dim">显示：</span>';
+        DepthCompare.EXCHANGE_KEYS.forEach(function (key) {
+            var meta = DepthCompare.EXCHANGE_META[key];
+            var checked = visibleExchanges[key] ? 'checked' : '';
+            html += '<label><input type="checkbox" data-ex="' + key + '" ' + checked + '>' +
+                '<span class="ex-dot" style="background:' + meta.colorBid + '"></span>' + meta.label + '</label>';
+        });
+        $('#ex_toggles').html(html);
+        $('#ex_toggles input').on('change', function () {
+            visibleExchanges[$(this).data('ex')] = this.checked;
+            if (lastBatch) renderChart(lastBatch);
+        });
+    }
+
+    function localFetcher() {
+        var url = $('#market_monitor').val();
+        var sid = $('#symbol_id').val();
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                url: url + '?symbol_id=' + sid,
+                dataType: 'json',
+                timeout: 10000,
+                success: resolve,
+                error: function (xhr, status, err) { reject(new Error(status + ': ' + err)); }
+            });
+        });
+    }
+
+    var depthObject = {
+        chart: {
+            type: 'area',
+            inverted: true,
+            backgroundColor: '#161b22',
+            spacing: [12, 16, 12, 12],
+            animation: { duration: 300 }
+        },
+        title: { text: null },
+        credits: { enabled: false },
+        xAxis: {
+            title: { text: '价格 Price', style: { color: '#8b949e', fontSize: '11px' } },
+            gridLineWidth: 1,
+            gridLineColor: 'rgba(48, 54, 61, 0.45)',
+            lineColor: '#30363d',
+            labels: { style: { color: '#8b949e', fontSize: '10px' } }
+        },
+        yAxis: {
+            title: { text: '单档量 Per Level', style: { color: '#8b949e', fontSize: '11px' } },
+            gridLineWidth: 0,
+            lineColor: '#30363d',
+            labels: {
+                style: { color: '#8b949e', fontSize: '10px' },
+                formatter: function () { return Math.abs(this.value); }
+            },
+            plotLines: [{ value: 0, color: '#58a6ff', width: 1.5, zIndex: 4 }]
+        },
+        legend: {
+            enabled: true,
+            itemStyle: { color: '#8b949e', fontSize: '11px' },
+            itemHoverStyle: { color: '#e6edf3' }
+        },
+        plotOptions: {
+            area: {
+                fillOpacity: 0.25,
+                lineWidth: 1.2,
+                step: 'right',
+                marker: { enabled: false },
+                states: { hover: { lineWidth: 1.8 } }
+            },
+            series: { animation: { duration: 250 } }
+        },
+        tooltip: {
+            shared: true,
+            backgroundColor: 'rgba(22, 27, 34, 0.95)',
+            borderColor: '#484f58',
+            borderRadius: 6,
+            style: { color: '#e6edf3', fontSize: '11px' },
+            formatter: function () {
+                var lines = ['<b>价格 ' + this.x + '</b>'];
+                this.points.forEach(function (p) {
+                    lines.push('<span style="color:' + p.series.color + '">' + p.series.name + '</span>: ' + Math.abs(p.y).toFixed(4));
+                });
+                return lines.join('<br/>');
+            }
+        },
+        series: []
+    };
+
+    var chart = Highcharts.chart('container', depthObject);
+
+    function initChartSeries() {
+        chart.series.slice().forEach(function (s) { s.remove(false); });
+        chartSeriesMap = {};
+        DepthCompare.EXCHANGE_KEYS.forEach(function (key) {
+            var meta = DepthCompare.EXCHANGE_META[key];
+            var bidId = key + '_bid';
+            var askId = key + '_ask';
+            chart.addSeries({
+                id: bidId,
+                type: 'area',
+                name: meta.label + ' 买',
+                color: meta.colorBid,
+                lineWidth: meta.lineWidth,
+                zIndex: meta.zIndex,
+                visible: visibleExchanges[key],
+                data: []
+            }, false);
+            chart.addSeries({
+                id: askId,
+                type: 'area',
+                name: meta.label + ' 卖',
+                color: meta.colorAsk,
+                lineWidth: meta.lineWidth,
+                zIndex: meta.zIndex,
+                dashStyle: key === 'local' ? 'Solid' : 'ShortDash',
+                visible: visibleExchanges[key],
+                data: []
+            }, false);
+            chartSeriesMap[bidId] = chart.get(bidId);
+            chartSeriesMap[askId] = chart.get(askId);
+        });
+        chart.redraw();
+    }
+
+    function renderChart(batch) {
+        DepthCompare.EXCHANGE_KEYS.forEach(function (key) {
+            var r = batch.results[key];
+            var meta = DepthCompare.EXCHANGE_META[key];
+            var bidSeries = chart.get(key + '_bid');
+            var askSeries = chart.get(key + '_ask');
+            if (!bidSeries || !askSeries) return;
+            bidSeries.update({ visible: visibleExchanges[key] }, false);
+            askSeries.update({ visible: visibleExchanges[key] }, false);
+            if (r && r.ok) {
+                bidSeries.setData(DepthCompare.levelsToSeries(r.bids, -1), false);
+                askSeries.setData(DepthCompare.levelsToSeries(r.asks, 1), false);
+            } else {
+                bidSeries.setData([], false);
+                askSeries.setData([], false);
+            }
+        });
+        chart.redraw();
+    }
+
+    function renderStatusBar(batch) {
+        var html = '';
+        DepthCompare.EXCHANGE_KEYS.forEach(function (key) {
+            var r = batch.results[key];
+            var meta = DepthCompare.EXCHANGE_META[key];
+            if (!r) return;
+            var cls = r.ok ? 'ok' : 'err';
+            var txt = r.ok
+                ? meta.label + ' ' + r.stats.bid_levels + '+' + r.stats.ask_levels + '档 ' + r.latency_ms + 'ms'
+                : meta.label + ' ERR: ' + (r.error || '?');
+            html += '<span class="ex-stat ' + cls + '">' + txt + '</span>';
+        });
+        html += '<span class="dim">批次 ' + batch.batch_ms + 'ms · 精度 ' + batch.price_decimals + ' 位</span>';
+        $('#status_bar').html(html);
+        $('#batch_info').text('批次耗时 ' + batch.batch_ms + 'ms · 精度 ' + batch.price_decimals + ' 位小数');
+    }
+
+    function renderBestCompare(batch) {
+        var rows = '';
+        DepthCompare.EXCHANGE_KEYS.forEach(function (key) {
+            var r = batch.results[key];
+            var meta = DepthCompare.EXCHANGE_META[key];
+            if (!r) return;
+            var bp = r.ok ? r.stats.bid_price : '—';
+            var ap = r.ok ? r.stats.ask_price : '—';
+            var lv = r.ok ? (r.stats.bid_levels + '/' + r.stats.ask_levels) : '—';
+            var lat = r.ok ? r.latency_ms + 'ms' : '<span class="err">' + (r.error || 'fail') + '</span>';
+            var cls = key === 'local' ? 'best-row' : '';
+            rows += '<tr class="' + cls + '"><td>' + meta.label + '</td><td class="green">' + bp +
+                '</td><td class="red">' + ap + '</td><td>' + lv + '</td><td>' + lat + '</td></tr>';
+        });
+        $('#best_cmp_body').html(rows);
+    }
+
+    function renderLocalTables(batch) {
+        var local = batch.results.local;
+        if (!local || !local.ok) {
+            $('#local_ask_body, #local_bid_body').html('<tr><td colspan="2" class="dim">本所数据不可用</td></tr>');
+            return;
+        }
+        var askHtml = '';
+        (local.asks || []).slice(0, 30).forEach(function (r) {
+            askHtml += '<tr><td>' + r.number + '</td><td>' + r.price + '</td></tr>';
+        });
+        $('#local_ask_body').html(askHtml || '<tr><td colspan="2" class="dim">无卖盘</td></tr>');
+
+        var bidHtml = '';
+        (local.bids || []).slice().reverse().slice(0, 30).forEach(function (r) {
+            bidHtml += '<tr><td>' + r.price + '</td><td>' + r.number + '</td></tr>';
+        });
+        $('#local_bid_body').html(bidHtml || '<tr><td colspan="2" class="dim">无买盘</td></tr>');
+    }
+
+    function applyBatch(batch) {
+        lastBatch = batch;
+        var symCfg = batch.symCfg;
+        $('#chart_title').text('多交易所深度对比 · ' + (symCfg.name || $('#symbol_id').val()));
+        $('#sym_label').text(symCfg.name + ' | BN:' + symCfg.binance + ' OKX:' + symCfg.okx);
+        renderStatusBar(batch);
+        renderBestCompare(batch);
+        renderLocalTables(batch);
+        renderChart(batch);
+    }
+
+    function getMarketData() {
+        if (fetchInFlight) return;
+        fetchInFlight = true;
+        $('#status_bar').html('<span class="pending">拉取中… 等待全部交易所响应</span>');
+
+        var symCfg = getSymCfg();
+        var timeoutMs = (appConfig && appConfig.defaults && appConfig.defaults.fetch_timeout_ms) || 10000;
+
+        DepthCompare.fetchAllDepths({
+            symCfg: symCfg,
+            localFetcher: localFetcher,
+            timeoutMs: timeoutMs
+        }).then(function (batch) {
+            applyBatch(batch);
+        }).catch(function (e) {
+            $('#status_bar').html('<span class="err">批次失败: ' + e.message + '</span>');
+        }).finally(function () {
+            fetchInFlight = false;
+        });
+    }
+    window.getMarketData = getMarketData;
+
+    function timeGetMarket() {
+        var tag = $('#timeGetMarket').attr('tag');
+        var interval = parseInt($('#refresh_ms').val(), 10) || 3000;
+        if (tag == 1) {
+            $('#timeGetMarket').attr('num', 0).attr('tag', 0)
+                .removeClass('btn-refresh-on').html('↻ 定时刷新');
+            clearInterval(timer);
+            clearInterval(timerV2);
+        } else {
+            $('#timeGetMarket').attr('tag', 1).addClass('btn-refresh-on');
+            timer = setInterval(function () {
+                getMarketData();
+                $('#timeGetMarket').attr('num', 0);
+            }, interval);
+            timerV2 = setInterval(function () {
+                var num = parseInt($('#timeGetMarket').attr('num'), 10) + 1;
+                $('#timeGetMarket').html('⏸ 停止 (' + num + 's)').attr('num', num);
+            }, 1000);
+            getMarketData();
+        }
+    }
+
+    function syncChartSize() {
+        var el = document.getElementById('container');
+        if (!el || !chart) return;
+        var h = el.clientHeight;
+        if (h > 200) chart.setSize(null, h, false);
+        else chart.reflow();
+    }
+
+    $(function () {
+        buildExchangeToggles();
+        initChartSeries();
+        if (window.ResizeObserver) {
+            new ResizeObserver(syncChartSize).observe(document.getElementById('container'));
+        }
+        $(window).on('resize orientationchange', syncChartSize);
+        setTimeout(syncChartSize, 0);
+
+        var started = false;
+        function bootApp(cfg) {
+            if (started) return;
+            started = true;
+            appConfig = cfg || null;
+            DepthCompare.loadBinanceTickSizes().then(function () {
+                timeGetMarket();
+            });
+        }
+        document.addEventListener('depth-compare-config-ready', function (e) {
+            bootApp(e.detail);
+        });
+        fetch('config/config.json').then(function (r) { return r.json(); })
+            .then(function (c) { appConfig = c; })
+            .catch(function () {});
+        setTimeout(function () { bootApp(appConfig); }, 500);
+    });
+</script>
+</body>
+</html>

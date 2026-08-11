@@ -1,0 +1,363 @@
+{
+  "_comment": "GET /debug/depthGather?symbol_id=1000003 — TRX，每档 number 随机 0.01~10",
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "stats": {
+      "ask_price": "0.25352",
+      "bid_price": "0.25342",
+      "mark_price": "0.25347",
+      "diff_price": "3.95",
+      "ask_qty": "94.10",
+      "bid_qty": "57.97",
+      "uid_num": 11,
+      "order_num": 574
+    },
+    "depth": {
+      "ask": [
+        {
+          "price": "0.25352",
+          "number": "4.79",
+          "uid_num": 1,
+          "order_num": 43,
+          "direction": -1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "0.25357",
+          "number": "5.11",
+          "uid_num": 2,
+          "order_num": 16,
+          "direction": -1,
+          "source_list": [
+            "5"
+          ]
+        },
+        {
+          "price": "0.25362",
+          "number": "7.03",
+          "uid_num": 5,
+          "order_num": 29,
+          "direction": -1,
+          "source_list": [
+            "5"
+          ]
+        },
+        {
+          "price": "0.25367",
+          "number": "9.40",
+          "uid_num": 2,
+          "order_num": 5,
+          "direction": -1,
+          "source_list": [
+            "5"
+          ]
+        },
+        {
+          "price": "0.25372",
+          "number": "9.70",
+          "uid_num": 2,
+          "order_num": 35,
+          "direction": -1,
+          "source_list": [
+            "4"
+          ]
+        },
+        {
+          "price": "0.25377",
+          "number": "9.14",
+          "uid_num": 2,
+          "order_num": 36,
+          "direction": -1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "0.25382",
+          "number": "8.81",
+          "uid_num": 2,
+          "order_num": 24,
+          "direction": -1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "0.25387",
+          "number": "9.22",
+          "uid_num": 8,
+          "order_num": 30,
+          "direction": -1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "0.25392",
+          "number": "8.76",
+          "uid_num": 7,
+          "order_num": 4,
+          "direction": -1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "0.25397",
+          "number": "6.64",
+          "uid_num": 5,
+          "order_num": 25,
+          "direction": -1,
+          "source_list": [
+            "4"
+          ]
+        },
+        {
+          "price": "0.25402",
+          "number": "8.82",
+          "uid_num": 4,
+          "order_num": 36,
+          "direction": -1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "0.25407",
+          "number": "6.68",
+          "uid_num": 1,
+          "order_num": 19,
+          "direction": -1,
+          "source_list": [
+            "5"
+          ]
+        }
+      ],
+      "bid": [
+        {
+          "price": "0.25342",
+          "number": "3.32",
+          "uid_num": 6,
+          "order_num": 38,
+          "direction": 1,
+          "source_list": [
+            "5"
+          ]
+        },
+        {
+          "price": "0.25337",
+          "number": "5.80",
+          "uid_num": 1,
+          "order_num": 23,
+          "direction": 1,
+          "source_list": [
+            "3"
+          ]
+        },
+        {
+          "price": "0.25332",
+          "number": "5.26",
+          "uid_num": 8,
+          "order_num": 24,
+          "direction": 1,
+          "source_list": [
+            "5"
+          ]
+        },
+        {
+          "price": "0.25327",
+          "number": "1.51",
+          "uid_num": 8,
+          "order_num": 36,
+          "direction": 1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "0.25322",
+          "number": "7.23",
+          "uid_num": 3,
+          "order_num": 38,
+          "direction": 1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "0.25317",
+          "number": "7.64",
+          "uid_num": 5,
+          "order_num": 14,
+          "direction": 1,
+          "source_list": [
+            "4"
+          ]
+        },
+        {
+          "price": "0.25312",
+          "number": "0.76",
+          "uid_num": 4,
+          "order_num": 21,
+          "direction": 1,
+          "source_list": [
+            "3"
+          ]
+        },
+        {
+          "price": "0.25307",
+          "number": "7.27",
+          "uid_num": 1,
+          "order_num": 15,
+          "direction": 1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "0.25302",
+          "number": "1.75",
+          "uid_num": 4,
+          "order_num": 3,
+          "direction": 1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "0.25297",
+          "number": "5.85",
+          "uid_num": 2,
+          "order_num": 20,
+          "direction": 1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "0.25292",
+          "number": "9.49",
+          "uid_num": 1,
+          "order_num": 36,
+          "direction": 1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "0.25287",
+          "number": "2.09",
+          "uid_num": 7,
+          "order_num": 4,
+          "direction": 1,
+          "source_list": [
+            "4"
+          ]
+        }
+      ]
+    },
+    "asks": [
+      [
+        0.25352,
+        4.79
+      ],
+      [
+        0.25357,
+        9.9
+      ],
+      [
+        0.25362,
+        16.93
+      ],
+      [
+        0.25367,
+        26.33
+      ],
+      [
+        0.25372,
+        36.03
+      ],
+      [
+        0.25377,
+        45.17
+      ],
+      [
+        0.25382,
+        53.98
+      ],
+      [
+        0.25387,
+        63.2
+      ],
+      [
+        0.25392,
+        71.96
+      ],
+      [
+        0.25397,
+        78.6
+      ],
+      [
+        0.25402,
+        87.42
+      ],
+      [
+        0.25407,
+        94.1
+      ]
+    ],
+    "bids": [
+      [
+        0.25342,
+        3.32
+      ],
+      [
+        0.25337,
+        9.12
+      ],
+      [
+        0.25332,
+        14.38
+      ],
+      [
+        0.25327,
+        15.89
+      ],
+      [
+        0.25322,
+        23.12
+      ],
+      [
+        0.25317,
+        30.76
+      ],
+      [
+        0.25312,
+        31.52
+      ],
+      [
+        0.25307,
+        38.79
+      ],
+      [
+        0.25302,
+        40.54
+      ],
+      [
+        0.25297,
+        46.39
+      ],
+      [
+        0.25292,
+        55.88
+      ],
+      [
+        0.25287,
+        57.97
+      ]
+    ]
+  }
+}

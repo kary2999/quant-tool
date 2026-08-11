@@ -1,0 +1,534 @@
+{
+  "_comment": "GET /debug/depthGather?symbol_id=1000001 — BTC，每档 number 随机 0.01~10",
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "stats": {
+      "ask_price": "66921.1",
+      "bid_price": "66081.1",
+      "mark_price": "66501.1",
+      "diff_price": "840.0",
+      "diff_rate": "0.3",
+      "ask_qty": "92.78",
+      "bid_qty": "91.38",
+      "uid_num": 14,
+      "order_num": 863,
+      "max_price": "74061.1",
+      "min_price": "58941.1"
+    },
+    "depth": {
+      "ask": [
+        {
+          "price": "66921.1",
+          "number": "0.36",
+          "uid_num": 2,
+          "order_num": 22,
+          "direction": -1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "67341.1",
+          "number": "6.38",
+          "uid_num": 5,
+          "order_num": 43,
+          "direction": -1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "67761.1",
+          "number": "4.41",
+          "uid_num": 2,
+          "order_num": 39,
+          "direction": -1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "68181.1",
+          "number": "5.71",
+          "uid_num": 1,
+          "order_num": 14,
+          "direction": -1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "68601.1",
+          "number": "5.93",
+          "uid_num": 6,
+          "order_num": 8,
+          "direction": -1,
+          "source_list": [
+            "3"
+          ]
+        },
+        {
+          "price": "69021.1",
+          "number": "5.53",
+          "uid_num": 1,
+          "order_num": 4,
+          "direction": -1,
+          "source_list": [
+            "3"
+          ]
+        },
+        {
+          "price": "69441.1",
+          "number": "7.81",
+          "uid_num": 7,
+          "order_num": 18,
+          "direction": -1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "69861.1",
+          "number": "2.57",
+          "uid_num": 7,
+          "order_num": 23,
+          "direction": -1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "70281.1",
+          "number": "3.23",
+          "uid_num": 2,
+          "order_num": 26,
+          "direction": -1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "70701.1",
+          "number": "8.22",
+          "uid_num": 1,
+          "order_num": 30,
+          "direction": -1,
+          "source_list": [
+            "3"
+          ]
+        },
+        {
+          "price": "71121.1",
+          "number": "5.44",
+          "uid_num": 5,
+          "order_num": 20,
+          "direction": -1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "71541.1",
+          "number": "7.24",
+          "uid_num": 4,
+          "order_num": 37,
+          "direction": -1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "71961.1",
+          "number": "3.75",
+          "uid_num": 2,
+          "order_num": 8,
+          "direction": -1,
+          "source_list": [
+            "5"
+          ]
+        },
+        {
+          "price": "72381.1",
+          "number": "7.34",
+          "uid_num": 1,
+          "order_num": 5,
+          "direction": -1,
+          "source_list": [
+            "5"
+          ]
+        },
+        {
+          "price": "72801.1",
+          "number": "7.58",
+          "uid_num": 8,
+          "order_num": 12,
+          "direction": -1,
+          "source_list": [
+            "3"
+          ]
+        },
+        {
+          "price": "73221.1",
+          "number": "7.87",
+          "uid_num": 3,
+          "order_num": 9,
+          "direction": -1,
+          "source_list": [
+            "5"
+          ]
+        },
+        {
+          "price": "73641.1",
+          "number": "2.69",
+          "uid_num": 3,
+          "order_num": 29,
+          "direction": -1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "74061.1",
+          "number": "0.72",
+          "uid_num": 1,
+          "order_num": 12,
+          "direction": -1,
+          "source_list": [
+            "4"
+          ]
+        }
+      ],
+      "bid": [
+        {
+          "price": "66081.1",
+          "number": "7.03",
+          "uid_num": 4,
+          "order_num": 33,
+          "direction": 1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "65661.1",
+          "number": "8.61",
+          "uid_num": 1,
+          "order_num": 23,
+          "direction": 1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "65241.1",
+          "number": "7.78",
+          "uid_num": 4,
+          "order_num": 19,
+          "direction": 1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "64821.1",
+          "number": "9.23",
+          "uid_num": 2,
+          "order_num": 8,
+          "direction": 1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "64401.1",
+          "number": "4.35",
+          "uid_num": 1,
+          "order_num": 23,
+          "direction": 1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "63981.1",
+          "number": "2.86",
+          "uid_num": 7,
+          "order_num": 18,
+          "direction": 1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "63561.1",
+          "number": "8.39",
+          "uid_num": 7,
+          "order_num": 41,
+          "direction": 1,
+          "source_list": [
+            "4"
+          ]
+        },
+        {
+          "price": "63141.1",
+          "number": "5.26",
+          "uid_num": 6,
+          "order_num": 43,
+          "direction": 1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "62721.1",
+          "number": "2.92",
+          "uid_num": 6,
+          "order_num": 37,
+          "direction": 1,
+          "source_list": [
+            "0"
+          ]
+        },
+        {
+          "price": "62301.1",
+          "number": "1.52",
+          "uid_num": 6,
+          "order_num": 44,
+          "direction": 1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "61881.1",
+          "number": "0.89",
+          "uid_num": 8,
+          "order_num": 26,
+          "direction": 1,
+          "source_list": [
+            "3"
+          ]
+        },
+        {
+          "price": "61461.1",
+          "number": "3.63",
+          "uid_num": 4,
+          "order_num": 35,
+          "direction": 1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "61041.1",
+          "number": "3.66",
+          "uid_num": 4,
+          "order_num": 44,
+          "direction": 1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "60621.1",
+          "number": "2.68",
+          "uid_num": 7,
+          "order_num": 44,
+          "direction": 1,
+          "source_list": [
+            "1"
+          ]
+        },
+        {
+          "price": "60201.1",
+          "number": "8.44",
+          "uid_num": 8,
+          "order_num": 3,
+          "direction": 1,
+          "source_list": [
+            "2"
+          ]
+        },
+        {
+          "price": "59781.1",
+          "number": "7.57",
+          "uid_num": 8,
+          "order_num": 14,
+          "direction": 1,
+          "source_list": [
+            "3"
+          ]
+        },
+        {
+          "price": "59361.1",
+          "number": "2.27",
+          "uid_num": 2,
+          "order_num": 16,
+          "direction": 1,
+          "source_list": [
+            "3"
+          ]
+        },
+        {
+          "price": "58941.1",
+          "number": "4.29",
+          "uid_num": 5,
+          "order_num": 33,
+          "direction": 1,
+          "source_list": [
+            "2"
+          ]
+        }
+      ]
+    },
+    "asks": [
+      [
+        66921.1,
+        0.36
+      ],
+      [
+        67341.1,
+        6.74
+      ],
+      [
+        67761.1,
+        11.15
+      ],
+      [
+        68181.1,
+        16.86
+      ],
+      [
+        68601.1,
+        22.79
+      ],
+      [
+        69021.1,
+        28.32
+      ],
+      [
+        69441.1,
+        36.13
+      ],
+      [
+        69861.1,
+        38.7
+      ],
+      [
+        70281.1,
+        41.93
+      ],
+      [
+        70701.1,
+        50.15
+      ],
+      [
+        71121.1,
+        55.59
+      ],
+      [
+        71541.1,
+        62.83
+      ],
+      [
+        71961.1,
+        66.58
+      ],
+      [
+        72381.1,
+        73.92
+      ],
+      [
+        72801.1,
+        81.5
+      ],
+      [
+        73221.1,
+        89.37
+      ],
+      [
+        73641.1,
+        92.06
+      ],
+      [
+        74061.1,
+        92.78
+      ]
+    ],
+    "bids": [
+      [
+        66081.1,
+        7.03
+      ],
+      [
+        65661.1,
+        15.64
+      ],
+      [
+        65241.1,
+        23.42
+      ],
+      [
+        64821.1,
+        32.65
+      ],
+      [
+        64401.1,
+        37.0
+      ],
+      [
+        63981.1,
+        39.86
+      ],
+      [
+        63561.1,
+        48.25
+      ],
+      [
+        63141.1,
+        53.51
+      ],
+      [
+        62721.1,
+        56.43
+      ],
+      [
+        62301.1,
+        57.95
+      ],
+      [
+        61881.1,
+        58.84
+      ],
+      [
+        61461.1,
+        62.47
+      ],
+      [
+        61041.1,
+        66.13
+      ],
+      [
+        60621.1,
+        68.81
+      ],
+      [
+        60201.1,
+        77.25
+      ],
+      [
+        59781.1,
+        84.82
+      ],
+      [
+        59361.1,
+        87.09
+      ],
+      [
+        58941.1,
+        91.38
+      ]
+    ]
+  }
+}

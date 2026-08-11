@@ -1,0 +1,69 @@
+{
+  "api_base": "http://18.177.36.184/futures",
+  "endpoints": {
+    "depthGather": "/debug/depthGather"
+  },
+  "defaults": {
+    "symbol_id": "1000001",
+    "refresh_ms": 3000,
+    "fetch_timeout_ms": 10000
+  },
+  "symbols": {
+    "1000001": {
+      "name": "BTCUSDT",
+      "binance": "BTCUSDT",
+      "okx": "BTC-USDT-SWAP",
+      "bybit": "BTCUSDT",
+      "kucoin": "XBTUSDTM",
+      "kucoin_multiplier": 0.001,
+      "okx_ct_val": 0.01
+    },
+    "1000002": {
+      "name": "ETHUSDT",
+      "binance": "ETHUSDT",
+      "okx": "ETH-USDT-SWAP",
+      "bybit": "ETHUSDT",
+      "kucoin": "ETHUSDTM",
+      "kucoin_multiplier": 0.01,
+      "okx_ct_val": 0.1
+    },
+    "1000003": {
+      "name": "TRXUSDT",
+      "binance": "TRXUSDT",
+      "okx": "TRX-USDT-SWAP",
+      "bybit": "TRXUSDT",
+      "kucoin": "TRXUSDTM",
+      "kucoin_multiplier": 100,
+      "okx_ct_val": 1000
+    }
+  },
+  "exchanges": {
+    "binance": {
+      "label": "Binance",
+      "depth_limit": 1000,
+      "url": "https://fapi.binance.com/fapi/v1/depth"
+    },
+    "okx": {
+      "label": "OKX",
+      "depth_limit": 400,
+      "url": "https://www.okx.com/api/v5/market/books"
+    },
+    "bybit": {
+      "label": "Bybit",
+      "depth_limit": 200,
+      "url": "https://api.bybit.com/v5/market/orderbook"
+    },
+    "kucoin": {
+      "label": "KuCoin",
+      "depth_limit": 100,
+      "url": "https://api-futures.kucoin.com/api/v1/level2/depth100"
+    }
+  },
+  "mock": {
+    "data_dir": "data/mock",
+    "files": {
+      "depthGather": "depthGather.symbol-{symbol_id}.json",
+      "depthGather_fallback": "depthGather.default.json"
+    }
+  }
+}
