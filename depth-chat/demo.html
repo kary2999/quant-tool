@@ -64,14 +64,27 @@
 <h2>2. Mock 开关</h2>
 <table>
   <tr><th>方式</th><th>说明</th></tr>
-  <tr><td><code>?mock=1</code></td><td>推荐。拦截 <code>/debug/depth</code> 与 <code>/debug/klineDiff</code>，改读本地 JSON</td></tr>
+  <tr><td><code>?mock=1</code></td><td>推荐。拦截 <code>contract.chishee.com</code> 全部 7 个接口，改读本地 JSON</td></tr>
   <tr><td><code>config/api-config.json</code></td><td>设置 <code>mock.enabled_by_default: true</code> 默认 mock</td></tr>
   <tr><td>桥接脚本</td><td><code>js/mock-bridge.js</code> — 在 jQuery 就绪后 patch <code>$.ajax</code></td></tr>
 </table>
 
+<div class="note">
+  <strong>Mock 覆盖范围（<code>contract.chishee.com</code> 全部 7 个接口）：</strong>
+  详见 <code>data/mock/mock.json</code> 索引文件。
+</div>
+<table>
+  <tr><th>接口</th><th>Mock 文件</th><th>说明</th></tr>
+  <tr><td><code>GET /pub/exchangeInfo</code></td><td><code>exchangeInfo.json</code></td><td>交易对配置，填充下拉框</td></tr>
+  <tr><td><code>GET /pub/v2/tickerList</code></td><td><code>tickerList.json</code></td><td>24h 牌价滚动条</td></tr>
+  <tr><td><code>GET /debug/depth</code></td><td><code>depth.symbol-{id}.json</code></td><td>本所深度 + 面积图</td></tr>
+  <tr><td><code>GET /debug/klineDiff</code></td><td><code>klineDiff.symbol-{id}.json</code></td><td>K 线对比</td></tr>
+  <tr><td><code>GET /debug/depthGather</code></td><td><code>depthGather.symbol-{id}.json</code></td><td>深度聚合（价位维度）</td></tr>
+  <tr><td><code>GET /debug/exchangePrice</code></td><td><code>exchangePrice.json</code></td><td>对标交易所价格</td></tr>
+  <tr><td><code>GET /debug/priceHash</code></td><td><code>priceHash.json</code></td><td>Mark / Index / Last</td></tr>
+</table>
 <div class="warn">
-  <strong>注意：</strong>mock 仅覆盖 <code>/debug/depth</code> 与 <code>/debug/klineDiff</code>。
-  牌价、exchangeInfo、depthGather、币安深度等仍走外网；离线演示时这些区块可能为空，属预期行为。
+  <strong>注意：</strong>币安深度等外网接口不在 mock 范围；离线演示时该区块可能为空，属预期行为。
 </div>
 
 <h2>3. Mock 文件命名</h2>
@@ -88,7 +101,33 @@
     <td><code>klineDiff.symbol-{symbol_id}.json</code></td>
     <td><code>klineDiff.default.json</code></td>
   </tr>
+  <tr>
+    <td><code>GET /debug/depthGather?symbol_id=</code></td>
+    <td><code>depthGather.symbol-{symbol_id}.json</code></td>
+    <td><code>depthGather.default.json</code></td>
+  </tr>
+  <tr>
+    <td><code>GET /pub/exchangeInfo</code></td>
+    <td><code>exchangeInfo.json</code></td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td><code>GET /pub/v2/tickerList</code></td>
+    <td><code>tickerList.json</code></td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td><code>GET /debug/exchangePrice</code></td>
+    <td><code>exchangePrice.json</code></td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td><code>GET /debug/priceHash</code></td>
+    <td><code>priceHash.json</code></td>
+    <td>—</td>
+  </tr>
 </table>
+<p>完整接口说明索引：<code>data/mock/mock.json</code> · 三套工具总索引：<code>../config/demo-mock.json</code></p>
 
 <p>已内置示例：</p>
 <ul>
@@ -190,6 +229,13 @@
 │   ├── api-config.js        # 加载配置
 │   └── mock-bridge.js       # ajax 拦截 / 下拉重写
 ├── data/mock/
+│   ├── mock.json                 # 接口索引 + 说明
+│   ├── exchangeInfo.json
+│   ├── tickerList.json
+│   ├── exchangePrice.json
+│   ├── priceHash.json
+│   ├── depthGather.default.json
+│   ├── depthGather.symbol-1000001.json
 │   ├── depth.default.json
 │   ├── depth.symbol-1000001.json
 │   ├── depth.symbol-1000003.json

@@ -1,23 +1,23 @@
 /**
- * 铺单表格 — 移植 quant-admin mx_market_making_box.js 列展示
+ * 网格配置表格 — 移植 quant-admin mx_market_making_box.js
  */
 (function (global) {
   'use strict';
 
   var state = {
-    symbol: null,
+    listRow: null,
     boxes: [],
     markPrice: 0
   };
 
   function directionFmt(val) {
     return parseInt(val, 10) === 1
-      ? '<span style="color:green">买盘</span>'
-      : '<span style="color:red">卖盘</span>';
+      ? '<span class="green">买盘</span>'
+      : '<span class="red">卖盘</span>';
   }
 
   function trustNumFmt(v, row) {
-    return '<span style="color:green">' + v + '</span> / <span style="color:red;">' + row.price_num + '</span>';
+    return '<span class="green">' + v + '</span> / <span class="red">' + row.price_num + '</span>';
   }
 
   function priceFloatFmt(v, row) {
@@ -33,10 +33,8 @@
   }
 
   function statusFmt(value) {
-    var yes = 1;
-    var no = 2;
-    var on = parseInt(value, 10) === yes;
-    return "<a href='javascript:;' title='点击切换' class='btn-change' data-status='" + value + "'>" +
+    var on = parseInt(value, 10) === 1;
+    return "<a href='javascript:;' class='toggle-link btn-change' data-status='" + value + "'>" +
       "<i class='fa fa-toggle-on " + (on ? 'text-success' : 'fa-flip-horizontal text-gray') + " fa-2x'></i></a>";
   }
 
@@ -46,11 +44,12 @@
   }
 
   function getCtx() {
+    var row = state.listRow || {};
     return {
       markPrice: state.markPrice,
-      contractValue: state.symbol ? state.symbol.contract_value : 1,
-      pricePrecision: state.symbol ? state.symbol.price_precision : 2,
-      numberPrecision: state.symbol ? state.symbol.number_precision : 3
+      contractValue: row.contract_value || 1,
+      pricePrecision: row.price_precision || 2,
+      numberPrecision: row.number_precision || 3
     };
   }
 
@@ -59,6 +58,62 @@
       if (a.dom !== b.dom) return a.dom - b.dom;
       return a.direction - b.direction;
     });
+  }
+
+  function renderPreview(box) {
+    var enriched = MMCalculation.enrichBox(box, getCtx());
+    return '价档 ' + enriched.price_num + ' · 绝对价 ' + enriched.min_price + ' ~ ' + enriched.max_price +
+      '<br/>固量 ' + enriched.min_number + ' ~ ' + enriched.max_number;
+  }
+
+  function openEditModal(box) {
+    $('#edit_box_id').val(box.box_id);
+    $('#edit_pid').val(box.pid);
+    $('#edit_direction').val(String(box.direction));
+    $('#edit_dom').val(box.dom);
+    $('#edit_trust_num').val(box.trust_num);
+    $('#edit_price_float').val(box.price_float);
+    $('#edit_number_float').val(box.number_float);
+    $('#edit_change_trust_num').val(box.change_trust_num);
+    $('#edit_change_number_float').val(box.change_number_float);
+    $('#edit_change_survival_time').val(box.change_survival_time);
+    $('#edit_preview').html(renderPreview(box));
+    $('#box_edit_modal').modal('show');
+  }
+
+  function updatePreviewFromForm() {
+    var draft = {
+      box_id: parseInt($('#edit_box_id').val(), 10),
+      pid: parseInt($('#edit_pid').val(), 10),
+      direction: parseInt($('#edit_direction').val(), 10),
+      dom: parseInt($('#edit_dom').val(), 10),
+      trust_num: parseInt($('#edit_trust_num').val(), 10) || 0,
+      price_float: $('#edit_price_float').val(),
+      number_float: $('#edit_number_float').val(),
+      change_trust_num: parseInt($('#edit_change_trust_num').val(), 10) || 0,
+      change_number_float: $('#edit_change_number_float').val(),
+      change_survival_time: $('#edit_change_survival_time').val(),
+      status: 1
+    };
+    $('#edit_preview').html(renderPreview(draft));
+  }
+
+  function saveEditForm(e) {
+    e.preventDefault();
+    var boxId = parseInt($('#edit_box_id').val(), 10);
+    var box = state.boxes.find(function (b) { return b.box_id === boxId; });
+    if (!box) return;
+
+    box.direction = parseInt($('#edit_direction').val(), 10);
+    box.trust_num = parseInt($('#edit_trust_num').val(), 10) || 0;
+    box.price_float = $('#edit_price_float').val();
+    box.number_float = $('#edit_number_float').val();
+    box.change_trust_num = parseInt($('#edit_change_trust_num').val(), 10) || 0;
+    box.change_number_float = $('#edit_change_number_float').val();
+    box.change_survival_time = $('#edit_change_survival_time').val();
+
+    $('#box_edit_modal').modal('hide');
+    render();
   }
 
   function render() {
@@ -100,17 +155,29 @@
     });
 
     $('#box_tbody').off('click', '.btn-edit-row').on('click', '.btn-edit-row', function () {
-      var boxId = $(this).data('id');
+      var boxId = parseInt($(this).data('id'), 10);
       var box = state.boxes.find(function (b) { return b.box_id === boxId; });
-      if (!box) return;
-      alert('本地模式：请直接编辑 JSON 配置文件\n\nbox_id: ' + boxId +
-        '\nprice_float: ' + box.price_float +
-        '\nnumber_float: ' + box.number_float);
+      if (box) openEditModal(box);
     });
   }
 
+  function bindModalEvents() {
+    $('#box_edit_form').off('submit').on('submit', saveEditForm);
+    $('#box_edit_form input, #box_edit_form select').off('input change').on('input change', updatePreviewFromForm);
+  }
+
+  function setContext(listRow, boxes) {
+    state.listRow = listRow;
+    state.boxes = boxes || [];
+    if (listRow && listRow.mark_price) {
+      state.markPrice = parseFloat(listRow.mark_price) || 0;
+    }
+    render();
+  }
+
+  /** 兼容旧 API：symbol + boxes 数组 */
   function setData(symbol, boxes) {
-    state.symbol = symbol;
+    state.listRow = symbol;
     state.boxes = boxes || [];
     if (symbol && symbol.mark_price) {
       state.markPrice = parseFloat(symbol.mark_price) || 0;
@@ -122,15 +189,20 @@
     var p = parseFloat(price);
     if (!p || isNaN(p)) return;
     state.markPrice = p;
+    if (state.listRow) state.listRow.mark_price = p;
     var inp = document.getElementById('mark_price_input');
     if (inp) inp.value = p;
     render();
   }
 
+  bindModalEvents();
+
   global.MMTable = {
     setData: setData,
+    setContext: setContext,
     setMarkPrice: setMarkPrice,
     render: render,
-    getMarkPrice: function () { return state.markPrice; }
+    getMarkPrice: function () { return state.markPrice; },
+    getBoxes: function () { return state.boxes; }
   };
 })(window);

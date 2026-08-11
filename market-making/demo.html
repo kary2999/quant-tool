@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>铺单工具 · Mock JSON 配置</title>
+  <style>
+    :root { --bg:#ecf0f5; --card:#fff; --border:#ddd; --text:#333; --dim:#666; --accent:#3c8dbc; }
+    body { font:14px/1.6 -apple-system,sans-serif; background:var(--bg); color:var(--text); padding:24px; max-width:920px; margin:0 auto; }
+    h1 { color:var(--accent); font-size:22px; margin-bottom:8px; }
+    h2 { font-size:16px; margin:24px 0 10px; }
+    pre { background:#f8f8f8; border:1px solid var(--border); padding:12px; overflow:auto; font-size:12px; }
+    code { background:#f0f0f0; padding:1px 5px; border-radius:3px; font-size:12px; }
+    table { width:100%; border-collapse:collapse; font-size:12px; margin:10px 0; background:var(--card); }
+    th, td { border:1px solid var(--border); padding:8px; }
+    .btns { margin:16px 0; }
+    .btn { display:inline-block; margin-right:8px; padding:8px 14px; border-radius:4px; text-decoration:none; font-weight:600; font-size:13px; }
+    .btn-go { background:#00a65a; color:#fff; }
+    .btn-mock { background:var(--accent); color:#fff; }
+    .btn-ghost { background:#fff; border:1px solid var(--border); color:var(--text); }
+  </style>
+</head>
+<body>
+
+<h1>MX 铺单工具 · Mock JSON 配置</h1>
+<p>对应 quant-admin <code>mx_market_making_list</code> + <code>mx_market_making_box</code>。</p>
+
+<div class="btns">
+  <a class="btn btn-go" href="index.html">打开铺单页</a>
+  <a class="btn btn-mock" href="index.html?mock=1">Mock 深度</a>
+  <a class="btn btn-ghost" href="data/symbol-1000001.json">symbol-1000001.json</a>
+  <a class="btn btn-ghost" href="../config/demo-mock.json">总索引</a>
+  <a class="btn btn-ghost" href="../">返回首页</a>
+</div>
+
+<h2>1. 数据文件 <code>data/symbol-1000001.json</code></h2>
+<pre>{
+  "list": [ /* 铺单任务 mx_market_making_list */ ],
+  "boxes": {
+    "1": [ /* PID=1 网格层 mx_market_making_box */ ],
+    "2": [ /* PID=2 */ ]
+  },
+  "active_pid": 1
+}</pre>
+
+<h2>2. list[] 主要字段</h2>
+<table>
+  <tr><th>字段</th><th>说明</th></tr>
+  <tr><td>pid / symbol_id / symbol</td><td>任务 ID、交易对</td></tr>
+  <tr><td>mark_price</td><td>标记价（驱动价档计算）</td></tr>
+  <tr><td>contract_value / price_precision</td><td>单张价值、价格精度</td></tr>
+  <tr><td>benchmark_exchange / strategy</td><td>对标平台、策略</td></tr>
+</table>
+
+<h2>3. boxes[] 网格字段</h2>
+<table>
+  <tr><th>字段</th><th>说明</th></tr>
+  <tr><td>direction</td><td>1 买盘 / -1 卖盘</td></tr>
+  <tr><td>dom</td><td>层级</td></tr>
+  <tr><td>price_float</td><td>相对 Mark 百分比，如 <code>100.005-100.3</code></td></tr>
+  <tr><td>number_float</td><td>固量区间（张）</td></tr>
+  <tr><td>change_number_float / change_survival_time</td><td>变动单区间 / 过期</td></tr>
+</table>
+
+<h2>4. Mock 来源</h2>
+<ul>
+  <li><code>js/mock-data.js</code> — file:// 内嵌（list + boxes + depth）</li>
+  <li><code>../config/app-config.json</code> — 全局 endpoint / mock 开关</li>
+  <li>深度 mock：<code>../depth-chat/data/mock/depth.symbol-{id}.json</code></li>
+</ul>
+
+<h2>5. URL 参数</h2>
+<pre>?mock=1
+?symbol_id=1000001
+?mark_price=66501.1</pre>
+
+</body>
+</html>

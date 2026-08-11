@@ -1,10 +1,13 @@
 {
-  "version": "1.0.0",
-  "description": "铺单工具外部配置 — depth 页不使用此文件",
+  "version": "1.1.0",
+  "description": "量化展示工具外部配置 — contract.chishee.com mock 见 depth-chat/data/mock/mock.json",
   "defaults": {
     "symbol_id": "1000001",
     "mark_price": 64129.1,
     "refresh_interval_ms": 500
+  },
+  "hosts": {
+    "production": "https://contract.chishee.com"
   },
   "endpoints": {
     "depth": {
@@ -14,11 +17,34 @@
         { "label": "测试", "url": "http://18.177.36.184/futures/debug/depth" }
       ],
       "default_index": 0
+    },
+    "depth_gather": {
+      "options": [
+        { "label": "生产", "url": "https://contract.chishee.com/debug/depthGather" },
+        { "label": "测试", "url": "http://18.177.36.184/futures/debug/depthGather" }
+      ],
+      "default_index": 1
     }
   },
   "mock": {
     "enabled": false,
-    "depth": "data/mock-depth.json"
+    "manifest": "../config/demo-mock.json",
+    "depth_chat_manifest": "../depth-chat/data/mock/mock.json",
+    "depth_gather_manifest": "../depth-gather/data/mock/mock.json",
+    "depth": "../depth-chat/data/mock/depth.default.json",
+    "depth_gather": "../depth-gather/data/mock/depthGather.default.json",
+    "exchangeInfo": "../depth-chat/data/mock/exchangeInfo.json",
+    "tickerList": "../depth-chat/data/mock/tickerList.json",
+    "exchangePrice": "../depth-chat/data/mock/exchangePrice.json",
+    "priceHash": "../depth-chat/data/mock/priceHash.json"
+  },
+  "demo": {
+    "index": "../config/demo-mock.json",
+    "pages": {
+      "market_making": "market-making/demo.html",
+      "depth_chat": "depth-chat/demo.html",
+      "depth_gather": "depth-gather/demo.html"
+    }
   },
   "market_making": {
     "file": "data/symbol-1000001.json"

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>depth-gather · Mock 配置说明</title>
+  <style>
+    :root { --bg:#0d1117; --bg2:#161b22; --border:#30363d; --text:#e6edf3; --dim:#8b949e; --accent:#58a6ff; --ok:#3fb950; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font:14px/1.6 -apple-system,sans-serif; padding:24px; max-width:920px; margin:0 auto; }
+    h1 { font-size:22px; color:var(--accent); margin-bottom:8px; }
+    h2 { font-size:16px; margin:24px 0 10px; border-bottom:1px solid var(--border); padding-bottom:6px; }
+    p, li { color:var(--dim); margin-bottom:8px; }
+    li { margin-left:20px; }
+    code { background:var(--bg2); border:1px solid var(--border); padding:1px 6px; border-radius:4px; font-size:12px; color:#f0883e; }
+    pre { background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:12px; overflow:auto; font-size:12px; margin:10px 0; }
+    table { width:100%; border-collapse:collapse; font-size:12px; margin:10px 0; }
+    th, td { border:1px solid var(--border); padding:8px; text-align:left; }
+    th { background:var(--bg2); }
+    .btns { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0; }
+    .btn { padding:8px 14px; border-radius:6px; text-decoration:none; font-size:13px; font-weight:600; }
+    .btn-go { background:#238636; color:#fff; }
+    .btn-mock { background:#1f6feb; color:#fff; }
+    .btn-ghost { background:var(--bg2); color:var(--text); border:1px solid var(--border); }
+    .note { background:rgba(88,166,255,.08); border-left:3px solid var(--accent); padding:10px 12px; margin:12px 0; font-size:13px; }
+  </style>
+</head>
+<body>
+
+<h1>depthGather-chat · 深度均匀性查看</h1>
+<p>
+  <strong>主要目的：</strong>查看本所某交易对挂单深度是否<strong>均匀</strong>（各档 Qty 是否合理、有无断崖/缺档）。
+  产品说明见 <a href="README.md" style="color:var(--accent);">README.md</a>（封板文档）。
+  下文为 Mock / 接口技术补充。
+</p>
+
+  <div class="btns">
+  <a class="btn btn-go" href="README.md">产品说明 README</a>
+  <a class="btn btn-go" href="depthGather-chat.html">打开工具</a>
+  <a class="btn btn-mock" href="depthGather-chat.html?mock=1">Mock 模式（推荐 Demo）</a>
+  <a class="btn btn-ghost" href="depthGather-chat.html?mock=1&symbol_id=1000003">Mock · TRX</a>
+  <a class="btn btn-ghost" href="../config/demo-mock.json">总索引 demo-mock.json</a>
+  <a class="btn btn-ghost" href="../">返回首页</a>
+</div>
+
+<h2>1. 配置文件</h2>
+<table>
+  <tr><th>文件</th><th>作用</th></tr>
+  <tr><td><code>config/mock-config.json</code></td><td>api_base、mock 文件命名规则</td></tr>
+  <tr><td><code>data/mock/mock.json</code></td><td>接口索引说明</td></tr>
+  <tr><td><code>js/mock-data.js</code></td><td>file:// 内嵌 fallback（自动生成）</td></tr>
+  <tr><td><code>js/mock-bridge.js</code></td><td>拦截 <code>/debug/depthGather</code></td></tr>
+</table>
+
+<h2>2. Mock / 测试环境切换</h2>
+<table>
+  <tr><th>方式</th><th>行为</th></tr>
+  <tr><td>下拉「Mock 本地」</td><td>读本地 JSON；<strong>始终保留</strong>，与测试环境并列</td></tr>
+  <tr><td>下拉「测试环境」</td><td>请求真接口；<strong>不可删除</strong>，随时可切回</td></tr>
+  <tr><td>切换下拉</td><td>立即拉取当前数据源（无需先开定时刷新）</td></tr>
+  <tr><td><code>?mock=1</code></td><td>仅默认选中 Mock；仍可在下拉切测试环境</td></tr>
+  <tr><td>无参数打开</td><td>默认选中测试环境</td></tr>
+  <tr><td>改 symbol_id</td><td>Enter 或失焦后按当前模式重新拉取</td></tr>
+</table>
+<div class="note">Mock 与测试环境<strong>两项始终同时存在</strong>；切换下拉后立即刷新。若用 <code>file://</code> 打开，切测试环境可能因 CORS 失败，请用 <code>./start.sh</code> 起 HTTP 服务。</div>
+
+<h2>3. Mock 文件命名</h2>
+<pre>GET /debug/depthGather?symbol_id={id}
+
+  → data/mock/depthGather.symbol-{symbol_id}.json
+  → 回退 data/mock/depthGather.default.json</pre>
+
+<p>已内置示例：</p>
+<ul>
+  <li><code>1000001</code> — BTC（18 档，每档 <code>number</code> 随机 0.01~10）</li>
+  <li><code>1000003</code> — TRX</li>
+</ul>
+
+<h2>4. 响应结构 <code>data</code></h2>
+<pre>{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "stats": {
+      "ask_price", "bid_price", "mark_price", "diff_price",
+      "ask_qty", "bid_qty", "uid_num", "order_num"
+    },
+    "depth": {
+      "ask": [{
+        "price", "number", "uid_num", "order_num",
+        "user_ids", "source_list", "direction"
+      }],
+      "bid": [ ... ]
+    },
+    "asks": [[price, cumQty], ...],
+    "bids": [[price, cumQty], ...]
+  }
+}</pre>
+
+<div class="note">
+  <strong>页面读法：</strong>左侧订单簿与右侧纵向图均用 <code>depth.ask/bid</code> 的 <code>number</code>（每一档独立量，非累计）。
+  <code>asks/bids</code> 为接口原样累计数组，本页图表<strong>不使用</strong>。
+  修改 mock 后 HTTP 模式刷新即可；file:// 需重新运行生成 <code>js/mock-data.js</code>。
+</div>
+
+<h2>5. 图例悬停说明（depthGather-chat 页面内）</h2>
+<table>
+  <tr><th>位置</th><th>悬停内容</th></tr>
+  <tr><td>顶栏 AP/BP/MP…</td><td>stats 汇总指标含义</td></tr>
+  <tr><td>◀ 买盘 / 卖盘 ▶</td><td>纵向图方向、数据源字段</td></tr>
+  <tr><td>来源图例 Web/App/量化…</td><td><code>source_list</code> 编号与 SOURCE_* 常量</td></tr>
+  <tr><td>表头 UV / Qty / Price</td><td>对应 <code>uid_num</code> / <code>number</code> / <code>price</code></td></tr>
+  <tr><td>表格 UV 数字</td><td>该档 <code>uid_num</code>、<code>order_num</code>、<code>user_ids</code></td></tr>
+</table>
+
+<h2>6. depthGather 用户 / 挂单字段</h2>
+<table>
+  <tr><th>字段</th><th>含义</th></tr>
+  <tr><td><code>uid_num</code></td><td>该价位不同 UID 数量（表格 UV 列）</td></tr>
+  <tr><td><code>order_num</code></td><td>该价位挂单笔数</td></tr>
+  <tr><td><code>user_ids</code></td><td>该价位全部 UID，逗号分隔</td></tr>
+  <tr><td><code>number</code></td><td>该价位标的量（表格 Qty）</td></tr>
+  <tr><td><code>source_list</code></td><td>1=Web 2=App 3=量化 4=强平 5=关联</td></tr>
+  <tr><td><code>direction</code></td><td>1 买盘 · -1 卖盘</td></tr>
+</table>
+<p>页面内可展开「depthGather 接口 · 用户 / 挂单字段说明」查看完整说明。</p>
+
+<h2>7. 启用方式</h2>
+<ul>
+  <li>URL：<code>?mock=1</code></li>
+  <li>下拉选「Mock 本地」</li>
+  <li><code>file://</code> 打开时自动 mock</li>
+</ul>
+
+</body>
+</html>

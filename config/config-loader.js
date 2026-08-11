@@ -43,6 +43,35 @@
     return out;
   }
 
+  function isFileProtocol() {
+    return global.location.protocol === 'file:';
+  }
+
+  function getEmbeddedConfig() {
+    return global.QUANT_TOOLS_MOCK && global.QUANT_TOOLS_MOCK.config;
+  }
+
+  function applyQueryOverrides(cfg) {
+    var query = parseQuery();
+    if (query.mock === '1' || query.mock === 'true') {
+      cfg.mock = cfg.mock || {};
+      cfg.mock.enabled = true;
+    }
+    if (isFileProtocol()) {
+      cfg.mock = cfg.mock || {};
+      cfg.mock.enabled = true;
+    }
+    if (query.symbol_id) {
+      cfg.defaults = cfg.defaults || {};
+      cfg.defaults.symbol_id = query.symbol_id;
+    }
+    if (query.mark_price) {
+      cfg.defaults = cfg.defaults || {};
+      cfg.defaults.mark_price = parseFloat(query.mark_price);
+    }
+    return cfg;
+  }
+
   function fetchJson(url) {
     return fetch(url, { cache: 'no-cache' }).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status + ' @ ' + url);
@@ -57,28 +86,27 @@
     var path = customPath || query.config || DEFAULT_CONFIG_PATH;
     var base = global.location.href;
 
+    if (isFileProtocol() && getEmbeddedConfig()) {
+      loaded = applyQueryOverrides(Object.assign({}, getEmbeddedConfig()));
+      global.QuantToolsConfig = loaded;
+      global.dispatchEvent(new CustomEvent('quant-tools-config-ready', { detail: loaded }));
+      loadPromise = Promise.resolve(loaded);
+      return loadPromise;
+    }
+
     loadPromise = fetchJson(resolveUrl(base, path))
       .then(function (cfg) {
-        loaded = cfg;
-        if (query.mock === '1' || query.mock === 'true') {
-          loaded.mock = loaded.mock || {};
-          loaded.mock.enabled = true;
-        }
-        if (query.symbol_id) {
-          loaded.defaults = loaded.defaults || {};
-          loaded.defaults.symbol_id = query.symbol_id;
-        }
-        if (query.mark_price) {
-          loaded.defaults = loaded.defaults || {};
-          loaded.defaults.mark_price = parseFloat(query.mark_price);
-        }
+        loaded = applyQueryOverrides(cfg);
         global.QuantToolsConfig = loaded;
         global.dispatchEvent(new CustomEvent('quant-tools-config-ready', { detail: loaded }));
         return loaded;
       })
       .catch(function (err) {
-        console.warn('[config-loader] 加载失败，使用空配置:', err.message);
-        loaded = { defaults: {}, endpoints: {}, mock: { enabled: false } };
+        console.warn('[config-loader] 加载失败，尝试内嵌 mock:', err.message);
+        var fallback = getEmbeddedConfig();
+        loaded = fallback
+          ? applyQueryOverrides(Object.assign({}, fallback))
+          : applyQueryOverrides({ defaults: {}, endpoints: {}, mock: { enabled: isFileProtocol() } });
         global.QuantToolsConfig = loaded;
         global.dispatchEvent(new CustomEvent('quant-tools-config-ready', { detail: loaded }));
         return loaded;
@@ -125,34 +153,54 @@
     if (sidEl && cfg.defaults.symbol_id) sidEl.value = cfg.defaults.symbol_id;
   }
 
-  /** mock 模式下包装 $.ajax，命中 depth / depthGather 时走本地 JSON */
+  /** mock 模式下包装 $.ajax，命中 contract.chishee.com 相关接口时走本地 JSON */
   function installMockAjax(cfg) {
     if (!cfg.mock || !cfg.mock.enabled || !global.jQuery) return;
-
     var $ = global.jQuery;
+    if ($.ajax.__quantMockInstalled) return;
+
     var orig = $.ajax.bind($);
+    var mockMap = [
+      { test: /depthGather/, key: 'depth_gather', fallback: 'depthGather.default.json' },
+      { test: /\/debug\/depth(\?|$)/, key: 'depth', fallback: 'depth.default.json' },
+      { test: /exchangeInfo/, key: 'exchangeInfo' },
+      { test: /tickerList/, key: 'tickerList' },
+      { test: /exchangePrice/, key: 'exchangePrice' },
+      { test: /priceHash/, key: 'priceHash' }
+    ];
 
     $.ajax = function (opts) {
       var url = typeof opts === 'string' ? opts : (opts && opts.url);
       if (!url) return orig(opts);
 
-      var mockPath = null;
-      if (url.indexOf('depthGather') >= 0 && cfg.mock.depth_gather) {
-        mockPath = cfg.mock.depth_gather;
-      } else if (url.indexOf('/debug/depth') >= 0 && cfg.mock.depth) {
-        mockPath = cfg.mock.depth;
-      }
+      for (var i = 0; i < mockMap.length; i++) {
+        var rule = mockMap[i];
+        if (!rule.test.test(url)) continue;
 
-      if (mockPath) {
-        var mockUrl = resolveUrl(global.location.href, mockPath);
-        var newOpts = typeof opts === 'string'
-          ? { url: mockUrl, dataType: 'json' }
-          : Object.assign({}, opts, { url: mockUrl });
-        console.info('[config-loader] mock →', mockUrl);
-        return orig(newOpts);
+        if (rule.key === 'depth' && global.QUANT_TOOLS_MOCK && global.QUANT_TOOLS_MOCK.depth) {
+          console.info('[config-loader] mock → embedded depth');
+          var depthPayload = global.QUANT_TOOLS_MOCK.depth;
+          var dfd = $.Deferred();
+          setTimeout(function () { dfd.resolve(depthPayload); }, 0);
+          return dfd.promise();
+        }
+
+        var mockPath = cfg.mock[rule.key];
+        if (!mockPath && rule.fallback) {
+          mockPath = '../depth-chat/data/mock/' + rule.fallback;
+        }
+        if (mockPath && mockPath !== 'embedded') {
+          var mockUrl = resolveUrl(global.location.href, mockPath);
+          var newOpts = typeof opts === 'string'
+            ? { url: mockUrl, dataType: 'json' }
+            : Object.assign({}, opts, { url: mockUrl });
+          console.info('[config-loader] mock →', mockUrl);
+          return orig(newOpts);
+        }
       }
       return orig(opts);
     };
+    $.ajax.__quantMockInstalled = true;
   }
 
   function bootstrap(opts) {

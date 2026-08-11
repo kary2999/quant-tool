@@ -1,0 +1,61 @@
+{
+  "_meta": {
+    "version": "1.2.0",
+    "description": "quant-visual-tools 三套 Demo 的 Mock JSON 总索引",
+    "usage": "各工具 demo 页有详细说明；URL 加 ?mock=1 启用本地 JSON"
+  },
+  "tools": [
+    {
+      "id": "market-making",
+      "title": "MX 铺单工具",
+      "demo_page": "market-making/demo.html",
+      "entry": "market-making/index.html?mock=1",
+      "config": {
+        "global": "config/app-config.json",
+        "embedded": "market-making/js/mock-data.js",
+        "data": "market-making/data/symbol-1000001.json"
+      },
+      "mock_keys": ["list", "boxes", "depth"]
+    },
+    {
+      "id": "depth-chat",
+      "title": "depth-chat V4",
+      "demo_page": "depth-chat/demo.html",
+      "entry": "depth-chat/depth-chat.html?mock=1",
+      "config": {
+        "local": "depth-chat/config/api-config.json",
+        "manifest": "depth-chat/data/mock/mock.json"
+      },
+      "mock_dir": "depth-chat/data/mock/",
+      "endpoints": [
+        "exchangeInfo.json",
+        "tickerList.json",
+        "depth.symbol-{symbol_id}.json",
+        "klineDiff.symbol-{symbol_id}.json",
+        "depthGather.symbol-{symbol_id}.json",
+        "exchangePrice.json",
+        "priceHash.json"
+      ]
+    },
+    {
+      "id": "depth-gather",
+      "title": "depthGather 深度聚合",
+      "demo_page": "depth-gather/demo.html",
+      "entry": "depth-gather/depthGather-chat.html?mock=1",
+      "config": {
+        "local": "depth-gather/config/mock-config.json",
+        "manifest": "depth-gather/data/mock/mock.json",
+        "embedded": "depth-gather/js/mock-data.js"
+      },
+      "mock_dir": "depth-gather/data/mock/",
+      "endpoints": [
+        "depthGather.symbol-{symbol_id}.json",
+        "depthGather.default.json"
+      ]
+    }
+  ],
+  "symbol_examples": [
+    { "symbol_id": "1000001", "name": "BTCUSDT", "mark_price": 66501.1 },
+    { "symbol_id": "1000003", "name": "TRXUSDT", "mark_price": 0.25347 }
+  ]
+}

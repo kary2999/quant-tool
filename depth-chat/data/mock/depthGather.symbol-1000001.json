@@ -1,0 +1,64 @@
+{
+  "_comment": "GET /debug/depthGather?symbol_id=1000001 — BTCUSDT 深度聚合",
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "stats": {
+      "ask_price": "64130.2",
+      "bid_price": "64128.0",
+      "mark_price": "64129.1",
+      "diff_price": "2.2",
+      "diff_rate": "0.34",
+      "ask_qty": "354.0",
+      "bid_qty": "333.0",
+      "uid_num": 3,
+      "order_num": 120,
+      "max_price": "64200.0",
+      "min_price": "64050.0"
+    },
+    "depth": {
+      "ask": {
+        "64130.2": {
+          "price": "64130.2",
+          "qty": "100",
+          "number": "0.1 BTC",
+          "uid_num": 2,
+          "order_num": 15,
+          "direction": -1,
+          "source_list": ["1", "2"]
+        },
+        "64135.0": {
+          "price": "64135.0",
+          "qty": "250",
+          "number": "0.25 BTC",
+          "uid_num": 3,
+          "order_num": 40,
+          "direction": -1,
+          "source_list": ["1", "3"]
+        }
+      },
+      "bid": {
+        "64128.0": {
+          "price": "64128.0",
+          "qty": "120",
+          "number": "0.12 BTC",
+          "uid_num": 1,
+          "order_num": 18,
+          "direction": 1,
+          "source_list": ["1"]
+        },
+        "64120.0": {
+          "price": "64120.0",
+          "qty": "213",
+          "number": "0.213 BTC",
+          "uid_num": 2,
+          "order_num": 35,
+          "direction": 1,
+          "source_list": ["2"]
+        }
+      }
+    },
+    "asks": [[64130.2, 0.1], [64135.0, 0.35]],
+    "bids": [[64128.0, 0.12], [64120.0, 0.333]]
+  }
+}

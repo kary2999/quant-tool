@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "description": "depth-gather 离线 Mock 索引",
+    "usage": "?mock=1 默认选 Mock；下拉可随时切「测试环境」走真接口",
+    "switching": "Mock 本地 = mock://depthGather + data-mock=1；测试环境 = api_base/debug/depthGather，ajax 不拦截",
+    "chart_data_source": "depth.ask/bid[].number — 每一档独立量；asks/bids 为接口累计字段，页面不用于绘图"
+  },
+  "endpoints": [
+    {
+      "id": "depthGather",
+      "method": "GET",
+      "path": "/debug/depthGather",
+      "params": [
+        {
+          "name": "symbol_id",
+          "required": true,
+          "example": "1000001"
+        }
+      ],
+      "mock_file": "depthGather.symbol-{symbol_id}.json",
+      "mock_fallback": "depthGather.default.json"
+    }
+  ]
+}

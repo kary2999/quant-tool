@@ -1,0 +1,58 @@
+/* FastAdmin 风格 — 对齐 quant-admin 铺单页 */
+body.skin-blue { background: #ecf0f5; font-size: 13px; }
+.file-mode-banner { padding: 8px 12px; margin-bottom: 0; font-size: 12px; }
+.wrapper { padding: 8px 10px 20px; max-width: 100%; }
+
+.panel-intro { border-radius: 3px; box-shadow: 0 1px 1px rgba(0,0,0,.05); margin-bottom: 8px; }
+.panel-intro > .panel-heading {
+  padding: 8px 12px; background: #fff; border-bottom: 1px solid #f4f4f4;
+}
+.panel-title { font-size: 14px; font-weight: 600; }
+.panel-body.no-padding { padding: 0; }
+
+.table-scroll { overflow-x: auto; max-width: 100%; }
+.table-scroll .table { margin-bottom: 0; min-width: 1400px; }
+
+#list_table th, #box_table th {
+  text-align: center; font-size: 12px; white-space: nowrap;
+  background: #fafafa; vertical-align: middle !important;
+}
+#list_table td, #box_table td {
+  text-align: center; font-size: 12px; vertical-align: middle !important;
+}
+#list_table tr.active td { background: #d9edf7 !important; }
+#list_table .price-abs, #box_table .price-abs { font-size: 14px; font-weight: 500; }
+
+.red { color: #dd4b39; }
+.green { color: #00a65a; }
+.blue { color: #3c8dbc; }
+.orange { color: #ff6200; }
+
+.toggle-link { cursor: pointer; }
+.toggle-link .fa-toggle-on.text-gray { color: #ccc; }
+
+/* 深度区 */
+.depth-panel { margin-bottom: 8px; background: #fff; }
+#container { width: 100%; height: 420px; }
+.depth-controls {
+  padding: 8px 12px;
+  background: rgba(29, 237, 12, 0.08);
+  border-top: 1px solid #eee;
+  overflow: hidden;
+}
+.depth-controls .form-control { display: inline-block; width: auto; vertical-align: middle; margin-right: 8px; }
+#stats_info { display: inline-block; font-size: 14px; vertical-align: middle; margin-left: 8px; }
+
+.box-panel .toolbar { padding: 6px 4px 10px; }
+.table-hover > tbody > tr:hover { background-color: rgba(60, 141, 188, 0.12) !important; }
+
+.advanced-config {
+  margin-top: 10px; padding: 10px; background: #fafafa; border: 1px dashed #ddd; border-radius: 4px;
+}
+.advanced-config label { margin-right: 16px; font-weight: normal; }
+.inline-input { display: inline-block !important; width: 120px !important; }
+
+#edit_preview { font-size: 12px; color: #666; line-height: 1.6; }
+.preview-row { margin-bottom: 0; }
+
+.btn-edit-row { padding: 2px 8px; }

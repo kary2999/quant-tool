@@ -119,7 +119,15 @@
         depthChatChange(asksData, bidsData);
       },
       error: function () {
-        /* 静默，表格仍可用本地 mark_price */
+        if (global.QUANT_TOOLS_MOCK && global.QUANT_TOOLS_MOCK.depth) {
+          var json = global.QUANT_TOOLS_MOCK.depth;
+          if (json && json.data) {
+            renderStats(json.data.stats);
+            $('#depth_analyze').val(json.data.depth_analyze || '');
+            depthChatChange(json.data.asks || [], json.data.bids || []);
+            return;
+          }
+        }
       }
     });
   }

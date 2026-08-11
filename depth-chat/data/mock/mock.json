@@ -1,0 +1,96 @@
+{
+  "_meta": {
+    "host": "https://contract.chishee.com",
+    "description": "contract.chishee.com 生产环境接口 Mock 索引 — depth-chat / depthGather 离线演示用",
+    "usage": "URL 加 ?mock=1 后，mock-bridge.js 拦截下列接口，改读同目录 JSON 文件",
+    "response_wrapper": "{ code: 0, msg: 'success', data: ... } — 与线上一致，前端读 json.data"
+  },
+  "endpoints": [
+    {
+      "id": "exchangeInfo",
+      "method": "GET",
+      "path": "/pub/exchangeInfo",
+      "full_url": "https://contract.chishee.com/pub/exchangeInfo",
+      "description": "交易对配置 — 返回 channel 下全部 symbol 列表（精度、步长、费率、杠杆、维持保证金档位等）",
+      "used_by": "depth-chat fetchExchangeInfo() — 启动时拉取，填充交易对下拉框与 sym_meta 展示",
+      "params": [],
+      "mock_file": "exchangeInfo.json",
+      "backend": "smoneyfuturesservice/Logic/Common/ExchangeLogic.php::exchangeInfo()"
+    },
+    {
+      "id": "tickerList",
+      "method": "GET",
+      "path": "/pub/v2/tickerList",
+      "full_url": "https://contract.chishee.com/pub/v2/tickerList",
+      "description": "24 小时牌价列表（压缩版）— field + value 二维结构，顶部滚动 ticker 条",
+      "used_by": "depth-chat fetchTickerList() — 每 3s 刷新，点击可切换交易对",
+      "params": [{ "name": "symbol_id", "required": false, "note": "可选过滤单个交易对" }],
+      "mock_file": "tickerList.json",
+      "backend": "smoneyfuturesservice/Controller/Api/V2/Pub.php::tickerList()"
+    },
+    {
+      "id": "depth",
+      "method": "GET",
+      "path": "/debug/depth",
+      "full_url": "https://contract.chishee.com/debug/depth?symbol_id={symbol_id}",
+      "description": "本所深度 — stats 顶栏指标 + depth.ask/bid 用户挂单详情 + asks/bids 累计深度（面积图/50档对比）",
+      "used_by": "depth-chat 主轮询 — #market_monitor 下拉所选 URL，默认 500ms 刷新",
+      "params": [{ "name": "symbol_id", "required": true, "example": "1000001" }],
+      "mock_file": "depth.symbol-{symbol_id}.json",
+      "mock_fallback": "depth.default.json",
+      "backend": "smoneyfuturesservice/Controller/Debug/Depth.php::index()"
+    },
+    {
+      "id": "klineDiff",
+      "method": "GET",
+      "path": "/debug/klineDiff",
+      "full_url": "https://contract.chishee.com/debug/klineDiff?symbol_id=&resolution=&size=&from=&to=",
+      "description": "K 线对比 — 返回 last（最新价 K 线）与 mark（标记价 K 线）两组 OHLCV",
+      "used_by": "depth-chat timeGetKline() — 展开 K 线面板后每 5s 拉取",
+      "params": [
+        { "name": "symbol_id", "required": true },
+        { "name": "resolution", "required": true, "example": "1", "note": "K 线周期（分钟）" },
+        { "name": "size", "required": false, "example": "1000" },
+        { "name": "from", "required": false, "note": "Unix 秒" },
+        { "name": "to", "required": false, "note": "Unix 秒" }
+      ],
+      "mock_file": "klineDiff.symbol-{symbol_id}.json",
+      "mock_fallback": "klineDiff.default.json",
+      "backend": "smoneyfuturesservice/Controller/Debug/Index.php::klineDiff()"
+    },
+    {
+      "id": "depthGather",
+      "method": "GET",
+      "path": "/debug/depthGather",
+      "full_url": "https://contract.chishee.com/debug/depthGather?symbol_id={symbol_id}",
+      "description": "深度聚合 — 按价位聚合挂单（order_num / uid_num / source_list），结构同 depth 但 ask/bid 为价位维度",
+      "used_by": "depth-chat fetchDepthGather() + depthGather-chat 主接口",
+      "params": [{ "name": "symbol_id", "required": true }],
+      "mock_file": "depthGather.symbol-{symbol_id}.json",
+      "mock_fallback": "depthGather.default.json",
+      "backend": "smoneyfuturesservice/Controller/Debug/Depth.php::gather()"
+    },
+    {
+      "id": "exchangePrice",
+      "method": "GET",
+      "path": "/debug/exchangePrice",
+      "full_url": "https://contract.chishee.com/debug/exchangePrice",
+      "description": "对标价格 — 各外部交易所（币安/Gate/OKX 等）买卖价与本所偏差，按 symbol_id 索引",
+      "used_by": "depth-chat fetchExchangePrice() — 「对标价格」面板，每 3s 刷新",
+      "params": [],
+      "mock_file": "exchangePrice.json",
+      "backend": "smoneyfuturesservice/Service/Mx/QuantService.php::benchmakPriceList()"
+    },
+    {
+      "id": "priceHash",
+      "method": "GET",
+      "path": "/debug/priceHash",
+      "full_url": "https://contract.chishee.com/debug/priceHash",
+      "description": "价格 Hash — 全市场 mark / index / last 及 M#I（Mark 相对 Index）、M#L（Mark 相对 Last）偏差",
+      "used_by": "depth-chat fetchPriceHash() — 顶栏 Mark/Index/Last 三块，每 3s 刷新",
+      "params": [],
+      "mock_file": "priceHash.json",
+      "backend": "smoneyfuturesservice/Controller/Debug/Index.php::priceHash()"
+    }
+  ]
+}

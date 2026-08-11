@@ -1,0 +1,37 @@
+{
+  "_comment": "GET /debug/priceHash — 全市场价格 Hash；depth-chat 按 symbol 名匹配 data[] 中节点",
+  "code": 0,
+  "msg": "success",
+  "data": [
+    {
+      "symbol": "BTCUSDT (1000001)",
+      "mark": "64129.1",
+      "index": "64128.5",
+      "last": "64129.1",
+      "M#I": "+0.01%",
+      "M#L": "+0.00%",
+      "moving_average": "64125.0",
+      "mark_prices": ["64120.0", "64125.0", "64129.1"]
+    },
+    {
+      "symbol": "ETHUSDT (1000002)",
+      "mark": "3450.25",
+      "index": "3450.10",
+      "last": "3450.25",
+      "M#I": "+0.04%",
+      "M#L": "+0.00%",
+      "moving_average": "3448.0",
+      "mark_prices": ["3445.0", "3448.0", "3450.25"]
+    },
+    {
+      "symbol": "TRXUSDT (1000003)",
+      "mark": "0.25347",
+      "index": "0.25345",
+      "last": "0.25347",
+      "M#I": "+0.08%",
+      "M#L": "+0.00%",
+      "moving_average": "0.25340",
+      "mark_prices": ["0.25335", "0.25340", "0.25347"]
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MX 铺单盒子</title>
+  <title>MX 铺单工具</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
         integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
@@ -18,146 +18,177 @@
   <script src="https://static.topcreditbank.com/2023/0719/exporting.js"></script>
   <script src="https://static.topcreditbank.com/2023/0719/zh_cn-1.4.0.min.js"></script>
   <script src="https://static.topcreditbank.com/2023/0719/w72sHD1689763738672.js"></script>
+  <script src="js/mock-data.js"></script>
   <script src="../config/config-loader.js"></script>
   <script src="js/calculation.js"></script>
-  <style>
-    body { background: #f1f4f6; }
-    .red { color: rgba(222, 57, 57, 0.99); }
-    .green { color: green; }
-    .blue { color: blue; }
-    .orange { color: #ff6200; }
-    .white { color: #333; }
-
-    #depth_panel {
-      background: #fff;
-      border-bottom: 1px solid #ddd;
-      margin-bottom: 0;
-    }
-    #container {
-      width: 100%;
-      height: 400px;
-      padding: 4px 8px 0;
-    }
-    .depth-controls {
-      padding: 8px 12px;
-      background-color: rgba(29, 237, 12, 0.1);
-      overflow: hidden;
-    }
-    .depth-controls .form-control {
-      display: inline-block;
-      width: auto;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-    #stats_info {
-      display: inline-block;
-      vertical-align: middle;
-      font-size: 15px;
-      margin-left: 12px;
-    }
-
-    .panel-box { margin: 0; border-radius: 0; border: none; box-shadow: none; }
-    .panel-box > .panel-body { padding: 0 8px 12px; }
-    #toolbar { padding: 8px 4px; }
-    #box_table th {
-      text-align: center;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    #box_table td {
-      text-align: center;
-      font-size: 12px;
-      vertical-align: middle !important;
-    }
-    #box_table .price-abs { font-size: 15px; }
-    .table-hover > tbody > tr:hover {
-      background-color: rgba(50, 158, 236, 0.34) !important;
-    }
-
-    .config-panel {
-      margin: 0;
-      border-radius: 0;
-      border-top: 1px dashed #ccc;
-    }
-    .config-panel .panel-heading { padding: 6px 12px; cursor: pointer; background: #fafafa; }
-    .config-panel .panel-body { padding: 10px 12px; font-size: 12px; }
-    .config-panel label { font-weight: normal; margin-right: 12px; }
-  </style>
+  <link rel="stylesheet" href="css/admin.css">
 </head>
-<body>
+<body class="skin-blue">
 
-<!-- 深度图（原 depthchat iframe 内容） -->
-<div id="depth_panel">
-  <div id="container"></div>
-  <input type="hidden" id="depth_analyze" value="">
-  <div class="depth-controls">
-    <input type="text" id="symbol_id" class="form-control" value="1000001"
-           placeholder="交易对ID" style="width:90px;">
-    <select id="market_monitor" class="form-control" style="width:120px;">
-      <option value="https://contract.hxexchge.com/debug/depth">DEV1环境</option>
-      <option value="https://contract.chishee.com/debug/depth">生产环境</option>
-    </select>
-    <div id="stats_info"></div>
-  </div>
+<div id="file_mode_banner" class="alert alert-warning file-mode-banner" style="display:none;margin:8px 10px 0;">
+  <strong>本地 file:// 模式</strong> — 浏览器禁止读本地 JSON，已自动切换内嵌 mock。
+  推荐运行 <code>./start.sh</code> 后访问 <code>http://localhost:8080/market-making/</code>
 </div>
 
-<!-- 铺单表格（原 mx_market_making_box/index） -->
-<div class="panel panel-default panel-box">
-  <div class="panel-body">
-    <div id="toolbar" class="toolbar">
-      <a href="javascript:;" class="btn btn-primary btn-refresh" title="刷新">
-        <i class="fa fa-refresh"></i>
-      </a>
-      <a href="javascript:;" class="btn btn-success btn-add" title="添加" style="visibility:hidden">
-        <i class="fa fa-plus"></i> 添加
-      </a>
-      <span class="text-muted" style="margin-left:8px;font-size:12px;">
-        配置: <span id="data_file_label">symbol-1000001.json</span>
-      </span>
+<div class="wrapper">
+  <!-- ① mx_market_making_list 铺单列表 -->
+  <div class="panel panel-default panel-intro list-panel">
+    <div class="panel-heading">
+      <span class="panel-title"><i class="fa fa-list"></i> mx_market_making_list · 铺单任务</span>
+      <span class="pull-right text-muted small">点击行切换 PID · 数据来自 JSON / 接口</span>
     </div>
-    <div class="table-responsive">
-      <table id="box_table" class="table table-striped table-bordered table-hover table-nowrap">
-        <thead>
-          <tr>
-            <th>PID</th>
-            <th>方向</th>
-            <th>层</th>
-            <th>固笔数</th>
-            <th>价格区间</th>
-            <th>固量区间</th>
-            <th>变笔数</th>
-            <th>变量区间</th>
-            <th>过期时间</th>
-            <th>开关</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody id="box_tbody"></tbody>
-      </table>
+    <div class="panel-body no-padding">
+      <div class="table-scroll">
+        <table id="list_table" class="table table-striped table-bordered table-hover table-nowrap">
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>交易对</th>
+              <th>开关</th>
+              <th>账户标记</th>
+              <th>标记价</th>
+              <th>对标平台</th>
+              <th>策略</th>
+              <th>对标方式</th>
+              <th>深度优化</th>
+              <th>盘口差‱</th>
+              <th>铺单比例</th>
+              <th>杠杆</th>
+              <th>敲单</th>
+              <th>移仓量</th>
+              <th>移仓额(U)</th>
+              <th>摊铺比</th>
+              <th>单张价值</th>
+              <th>步长</th>
+              <th>价格精度</th>
+              <th>结算单位</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="list_tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- 外部配置（折叠，不影响原界面） -->
-<div class="panel panel-default config-panel">
-  <div class="panel-heading" data-toggle="collapse" data-target="#cfg_body">
-    <i class="fa fa-cog"></i> 高级 · 外部配置
-    <span class="pull-right fa fa-chevron-down"></span>
+  <!-- ② 深度图（mx_market_making_box/depthchat iframe 区域） -->
+  <div class="panel panel-default panel-intro depth-panel" id="depth_panel">
+    <div id="container"></div>
+    <input type="hidden" id="depth_analyze" value="">
+    <div class="depth-controls">
+      <input type="text" id="symbol_id" class="form-control input-sm" value="1000001" style="width:90px;">
+      <select id="market_monitor" class="form-control input-sm" style="width:140px;">
+        <option value="http://18.177.36.184/futures/debug/depth">测试环境</option>
+        <option value="https://contract.hxexchge.com/debug/depth">DEV1环境</option>
+      </select>
+      <div id="stats_info"></div>
+    </div>
   </div>
-  <div id="cfg_body" class="panel-collapse collapse">
+
+  <!-- ③ mx_market_making_box 网格配置 -->
+  <div class="panel panel-default panel-intro box-panel">
     <div class="panel-body">
-      <label>Mark 价格（接口不可用时手动）:
-        <input type="text" id="mark_price_input" class="form-control input-sm" style="width:120px;display:inline-block" value="">
-      </label>
-      <label>加载 JSON:
-        <input type="file" id="data_file" accept=".json" class="input-sm">
-      </label>
-      <label><input type="checkbox" id="use_mock"> 使用 mock 深度数据</label>
+      <div id="toolbar" class="toolbar">
+        <a href="javascript:;" class="btn btn-primary btn-sm btn-refresh" title="刷新"><i class="fa fa-refresh"></i></a>
+        <a href="javascript:;" class="btn btn-success btn-sm btn-add-box" title="添加"><i class="fa fa-plus"></i> 添加</a>
+        <span class="text-muted small" style="margin-left:8px;">
+          PID <strong id="active_pid_label">1</strong> ·
+          配置 <span id="data_file_label">symbol-1000001.json</span>
+        </span>
+        <a href="javascript:;" class="btn btn-default btn-sm pull-right" data-toggle="collapse" data-target="#cfg_body">
+          <i class="fa fa-cog"></i> 高级
+        </a>
+      </div>
+      <div class="table-responsive">
+        <table id="box_table" class="table table-striped table-bordered table-hover table-nowrap">
+          <thead>
+            <tr>
+              <th>PID</th><th>方向</th><th>层</th><th>固笔数</th>
+              <th>价格区间</th><th>固量区间</th><th>变笔数</th><th>变量区间</th>
+              <th>过期时间</th><th>开关</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="box_tbody"></tbody>
+        </table>
+      </div>
+      <div id="cfg_body" class="collapse advanced-config">
+        <label>Mark 价格 <input type="text" id="mark_price_input" class="form-control input-sm inline-input"></label>
+        <label>加载 JSON <input type="file" id="data_file" accept=".json"></label>
+        <label><input type="checkbox" id="use_mock"> mock 深度</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 网格编辑弹窗（同 quant-admin mx_market_making_box/edit） -->
+<div class="modal fade" id="box_edit_modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">编辑 · 网格配置</h4>
+      </div>
+      <form id="box_edit_form" class="form-horizontal">
+        <div class="modal-body">
+          <input type="hidden" id="edit_box_id">
+          <div class="form-group">
+            <label class="col-sm-3 control-label">PID</label>
+            <div class="col-sm-8"><input class="form-control" id="edit_pid" readonly></div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">方向</label>
+            <div class="col-sm-8">
+              <select class="form-control" id="edit_direction">
+                <option value="1">买盘</option>
+                <option value="-1">卖盘</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">层级</label>
+            <div class="col-sm-8"><input class="form-control" id="edit_dom" readonly></div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">固定单笔数</label>
+            <div class="col-sm-8"><input class="form-control" id="edit_trust_num" type="number"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">价格区间</label>
+            <div class="col-sm-8"><input class="form-control" id="edit_price_float" placeholder="100.005-100.3"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">固定单数量区间</label>
+            <div class="col-sm-8"><input class="form-control" id="edit_number_float" placeholder="10000-10000"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">变动单笔数</label>
+            <div class="col-sm-8"><input class="form-control" id="edit_change_trust_num"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">变动单数量区间</label>
+            <div class="col-sm-8"><input class="form-control" id="edit_change_number_float"></div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">变动单过期区间</label>
+            <div class="col-sm-8"><input class="form-control" id="edit_change_survival_time"></div>
+          </div>
+          <div class="form-group preview-row">
+            <label class="col-sm-3 control-label">计算预览</label>
+            <div class="col-sm-8" id="edit_preview"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+          <button type="reset" class="btn btn-default">重置</button>
+          <button type="submit" class="btn btn-success">确定</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
 <script src="js/depth.js"></script>
+<script src="js/list.js"></script>
 <script src="js/table.js"></script>
 <script src="js/app.js"></script>
 </body>

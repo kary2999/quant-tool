@@ -131,17 +131,20 @@ chmod +x sync.sh start.sh
 
 ---
 
-### 3. depthGather-chat（深度聚合）
+### 3. depthGather-chat（深度均匀性查看）· **已封板**
 
-**源码：** `smoneyfuturesservice/depthGather-chat.html` — **原样拷贝，本目录内不做任何改动。**
+**入口：** `/depth-gather/depthGather-chat.html`  
+**产品说明：** [`depth-gather/README.md`](depth-gather/README.md)
 
-**功能：**
+**主要目的：** 查看本所某交易对挂单深度是否**均匀** — 各档 `Qty` 是否合理、有无断崖/缺档/一侧偏薄。
 
-- 按 UID 聚合的买卖盘明细表
-- 深度面积图 + AP/BP/MP 等指标
-- 500ms 定时刷新
+**功能摘要：**
 
-**更新方式：** 同 depth-chat，执行 `./sync.sh`。
+- 左侧：按价位聚合的订单簿（UV / Qty / Price）
+- 右侧：纵向单档深度图（每档独立量，非累计）
+- 测试环境 / Mock 本地可动态切换；500ms 定时刷新
+
+**维护：** `depthGather-chat.html` **不再改动**；Mock、配置、文档见 `depth-gather/` 目录其他文件。
 
 ---
 
@@ -168,8 +171,11 @@ quant-visual-tools/
 │       └── mock-depth.json
 ├── depth-chat/             # ② 深度 V4（只拷贝，勿改）
 │   └── depth-chat.html
-└── depth-gather/           # ③ 深度聚合（只拷贝，勿改）
-    └── depthGather-chat.html
+└── depth-gather/           # ③ 深度均匀性（主页面封板）
+    ├── README.md           # 产品说明（推荐阅读）
+    ├── depthGather-chat.html
+    ├── demo.html           # Mock / 接口技术说明
+    └── data/mock/
 ```
 
 ---
@@ -179,12 +185,36 @@ quant-visual-tools/
 | 页面 | 是否可改 | 更新方式 |
 |------|----------|----------|
 | `depth-chat.html` | ❌ 不改 | 改 `smoneyfuturesservice` 源码 → `./sync.sh` |
-| `depthGather-chat.html` | ❌ 不改 | 同上 |
+| `depthGather-chat.html` | ❌ 封板不改 | Mock / 说明见 `depth-gather/README.md`、`demo.html` |
 | `market-making/` | ✅ 可改 | 直接编辑，或换 JSON 配置 |
 
 ---
 
-## 六、常见问题
+## 六、Mock JSON 配置（Demo 离线）
+
+总索引：**`config/demo-mock.json`**
+
+| 工具 | Demo 说明页 | Mock 数据目录 | 启用 |
+|------|-------------|---------------|------|
+| 铺单 | `market-making/demo.html` | `data/symbol-1000001.json` + `js/mock-data.js` | `?mock=1` |
+| depth-chat | `depth-chat/demo.html` | `depth-chat/data/mock/` | `?mock=1` |
+| depth-gather | `depth-gather/demo.html` | `depth-gather/data/mock/` | `?mock=1` |
+
+**depth-gather mock 文件：**
+
+```
+depth-gather/data/mock/
+├── mock.json                          # 接口索引
+├── depthGather.default.json           # 默认回退
+├── depthGather.symbol-1000001.json    # BTC 18 档
+└── depthGather.symbol-1000003.json    # TRX
+```
+
+配置：`depth-gather/config/mock-config.json` · 桥接：`js/mock-bridge.js`
+
+---
+
+## 七、常见问题
 
 **Q: 深度页空白 / 接口报错？**  
 A: 检查页面内环境下拉是否选对；本所 debug 接口需网络可达。depth 页与铺单工具独立，接口问题不影响铺单表格（用 JSON + 手动 Mark 价）。

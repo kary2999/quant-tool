@@ -47,11 +47,11 @@
   <p class="sub">从 quant-admin / smoneyfuturesservice 提取的独立静态页面，本地 HTTP 服务即可使用。</p>
 
   <div class="grid">
-    <a class="card" href="market-making/index.html">
+    <a class="card" href="market-making/demo.html">
       <span class="tag src">quant-admin</span>
       <span class="tag">铺单</span>
       <h2>① MX 铺单工具</h2>
-      <p>对应 <code>9527.php/mx_market_making_list</code> + 铺单盒子。深度图 + 铺单配置表，前端按精度计算价档数、固量区间、挂单量。</p>
+      <p>铺单列表 + 深度图 + 网格配置。Mock：<code>data/symbol-1000001.json</code> + <code>js/mock-data.js</code>，见 demo 说明。</p>
     </a>
 
     <a class="card" href="depth-chat/demo.html">
@@ -61,16 +61,18 @@
       <p>深度服务 V4：本所 vs 币安深度对比、50 档表格、K 线。源码 sync 拷贝 + mock 配置（见 demo.html 说明）。</p>
     </a>
 
-    <a class="card" href="depth-gather/depthGather-chat.html">
+    <a class="card" href="depth-gather/README.md">
       <span class="tag src">smoneyfuturesservice</span>
       <span class="tag">聚合</span>
+      <span class="tag" style="color:#d29922;border-color:#9e6a03">封板</span>
       <h2>③ depthGather-chat</h2>
-      <p>深度聚合页：按 UID 聚合的买卖盘明细 + 深度图。源码原样拷贝，未改动。</p>
+      <p>查看深度是否均匀：左订单簿逐档 Qty + 右纵向单档图。测试环境 / Mock 可切换。说明见 README.md。</p>
     </a>
   </div>
 
   <footer>
     启动方式：<code>./start.sh</code> 或 <code>python3 -m http.server 8080</code><br>
+    Mock 总索引：<code>config/demo-mock.json</code><br>
     同步 depth 页：<code>./sync.sh</code>（从 smoneyfuturesservice 重新拷贝）<br>
     详细说明见 <code>README.md</code>
   </footer>

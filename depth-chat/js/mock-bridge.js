@@ -1,12 +1,24 @@
 /**
  * depth-chat mock 桥接
  * - api_base 来自 config/api-config.json（默认 http://18.177.36.184/futures）
- * - ?mock=1 时 /debug/depth、/debug/klineDiff 读本地 data/mock/*.json
+ * - ?mock=1 时 contract.chishee.com 全部接口读本地 data/mock/*.json
+ * - 接口清单与说明见 data/mock/mock.json
  */
 (function (global) {
   'use strict';
 
   var patched = false;
+
+  /** 路径 → mock 配置 key（需 symbol_id 的带 sid 参数） */
+  var ROUTES = [
+    { test: /\/pub\/exchangeInfo(\?|$)/, kind: 'exchangeInfo', needSid: false },
+    { test: /\/pub\/v2\/tickerList/, kind: 'tickerList', needSid: false },
+    { test: /\/debug\/depthGather/, kind: 'depthGather', needSid: true },
+    { test: /\/debug\/exchangePrice/, kind: 'exchangePrice', needSid: false },
+    { test: /\/debug\/priceHash/, kind: 'priceHash', needSid: false },
+    { test: /\/debug\/klineDiff/, kind: 'klineDiff', needSid: true },
+    { test: /\/debug\/depth(\?|$)/, kind: 'depth', needSid: true }
+  ];
 
   function symbolIdFromUrl(url) {
     try {
@@ -18,12 +30,21 @@
     }
   }
 
+  function matchRoute(url) {
+    for (var i = 0; i < ROUTES.length; i++) {
+      if (ROUTES[i].test.test(url)) return ROUTES[i];
+    }
+    return null;
+  }
+
   function mockFile(cfg, kind, sid) {
     var mock = cfg.mock || {};
     var dir = mock.data_dir || 'data/mock';
     var tpl = (mock.files && mock.files[kind]) || (kind + '.symbol-{symbol_id}.json');
     var fb = (mock.files && mock.files[kind + '_fallback']) || (kind + '.default.json');
-    var name = tpl.replace('{symbol_id}', sid || 'default');
+    var name = tpl.indexOf('{symbol_id}') >= 0
+      ? tpl.replace('{symbol_id}', sid || 'default')
+      : tpl;
     return { primary: dir + '/' + name, fallback: dir + '/' + fb };
   }
 
@@ -31,6 +52,7 @@
     var url = DepthChatConfigLoader.resolveUrl(paths.primary);
     return fetch(url, { cache: 'no-cache' }).then(function (r) {
       if (r.ok) return r.json();
+      if (!paths.fallback) throw new Error('mock missing: ' + paths.primary);
       return fetch(DepthChatConfigLoader.resolveUrl(paths.fallback), { cache: 'no-cache' }).then(function (r2) {
         if (!r2.ok) throw new Error('mock missing: ' + paths.primary);
         return r2.json();
@@ -38,21 +60,40 @@
     });
   }
 
-  function isDepthUrl(url) {
-    return /\/debug\/depth(\?|$)/.test(url) && url.indexOf('depthGather') < 0;
-  }
-
-  function isKlineDiffUrl(url) {
-    return /\/debug\/klineDiff/.test(url);
+  function isChisheeOrDebug(url) {
+    return /contract\.chishee\.com/.test(url) ||
+      /\/debug\//.test(url) ||
+      /\/pub\//.test(url) ||
+      /\/futures\/debug\//.test(url);
   }
 
   function rewriteApiBase(url, cfg) {
     if (!cfg || !cfg.api_base) return url;
     var base = cfg.api_base.replace(/\/$/, '');
-    // 将生产/测试硬编码 host 统一到配置的 api_base（非 mock 模式）
     return url
       .replace(/^https?:\/\/[^/]+\/debug\//, base + '/debug/')
-      .replace(/^https?:\/\/[^/]+\/futures\/debug\//, base + '/debug/');
+      .replace(/^https?:\/\/[^/]+\/pub\//, base + '/pub/')
+      .replace(/^https?:\/\/[^/]+\/futures\/debug\//, base + '/debug/')
+      .replace(/^https?:\/\/[^/]+\/futures\/pub\//, base + '/pub/');
+  }
+
+  function ajaxMock(cfg, url, o) {
+    var route = matchRoute(url);
+    if (!route) return null;
+    var sid = route.needSid ? symbolIdFromUrl(url) : '';
+    var paths = mockFile(cfg, route.kind, sid);
+    var $ = global.jQuery;
+    var dfd = $.Deferred();
+    fetchMockJson(paths).then(function (json) {
+      if (o.success) o.success(json);
+      if (o.complete) o.complete();
+      dfd.resolve(json);
+    }).catch(function (err) {
+      if (o.error) o.error({ status: 0, statusText: err.message }, 'error', err.message);
+      if (o.complete) o.complete();
+      dfd.reject(err);
+    });
+    return dfd.promise();
   }
 
   function patchAjax(cfg) {
@@ -65,48 +106,20 @@
       var o = typeof opts === 'string' ? { url: opts } : Object.assign({}, opts);
       var url = o.url || '';
 
-      if (cfg.mock && cfg.mock.enabled) {
-        if (isDepthUrl(url)) {
-          var sid = symbolIdFromUrl(url);
-          var paths = mockFile(cfg, 'depth', sid);
-          var dfd = $.Deferred();
-          fetchMockJson(paths).then(function (json) {
-            if (o.success) o.success(json);
-            if (o.complete) o.complete();
-            dfd.resolve(json);
-          }).catch(function (err) {
-            if (o.error) o.error({ status: 0, statusText: err.message }, 'error', err.message);
-            if (o.complete) o.complete();
-            dfd.reject(err);
-          });
-          return dfd.promise();
-        }
-        if (isKlineDiffUrl(url)) {
-          var sid2 = symbolIdFromUrl(url);
-          var paths2 = mockFile(cfg, 'klineDiff', sid2);
-          var dfd2 = $.Deferred();
-          fetchMockJson(paths2).then(function (json) {
-            if (o.success) o.success(json);
-            if (o.complete) o.complete();
-            dfd2.resolve(json);
-          }).catch(function (err) {
-            if (o.error) o.error({ status: 0, statusText: err.message }, 'error', err.message);
-            if (o.complete) o.complete();
-            dfd2.reject(err);
-          });
-          return dfd2.promise();
-        }
+      if (cfg.mock && cfg.mock.enabled && isChisheeOrDebug(url)) {
+        var mocked = ajaxMock(cfg, url, o);
+        if (mocked) return mocked;
       }
 
-      if (url.indexOf('/debug/') >= 0) {
+      if (isChisheeOrDebug(url)) {
         o.url = rewriteApiBase(url, cfg);
       }
       return orig(o);
     };
 
     applySelectDefaults(cfg);
-    console.info('[depth-chat mock-bridge] active mock=' + !!(cfg.mock && cfg.mock.enabled) +
-      ' api_base=' + cfg.api_base);
+    console.info('[depth-chat mock-bridge] mock=' + !!(cfg.mock && cfg.mock.enabled) +
+      ' api_base=' + cfg.api_base + ' manifest=data/mock/mock.json');
   }
 
   /** 将下拉默认指向配置 api_base（非 mock 时走真接口） */

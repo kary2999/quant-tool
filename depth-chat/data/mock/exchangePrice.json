@@ -1,0 +1,29 @@
+{
+  "_comment": "GET /debug/exchangePrice — 对标价格；depth-chat 读 data[symbol_id].price[交易所名]",
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "1000001": {
+      "symbol": "BTCUSDT (1000001)",
+      "price": {
+        "binance": "卖: 64131.5; 买: 64130.8; 时差: 45 ms",
+        "gate": "卖: 64132.0; 买: 64129.5; 时差: 62 ms",
+        "okex": "卖: 64130.9; 买: 64129.2; 时差: 78 ms"
+      }
+    },
+    "1000002": {
+      "symbol": "ETHUSDT (1000002)",
+      "price": {
+        "binance": "卖: 3450.35; 买: 3450.28; 时差: 38 ms",
+        "gate": "卖: 3450.40; 买: 3450.22; 时差: 55 ms"
+      }
+    },
+    "1000003": {
+      "symbol": "TRXUSDT (1000003)",
+      "price": {
+        "binance": "卖: 0.25352; 买: 0.25346; 时差: 41 ms",
+        "gate": "卖: 0.25353; 买: 0.25345; 时差: 58 ms"
+      }
+    }
+  }
+}

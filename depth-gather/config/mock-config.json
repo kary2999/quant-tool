@@ -1,0 +1,20 @@
+{
+  "api_base": "http://18.177.36.184/futures",
+  "endpoints": {
+    "depthGather": "/debug/depthGather"
+  },
+  "defaults": {
+    "symbol_id": "1000001",
+    "refresh_interval_ms": 500
+  },
+  "mock": {
+    "enabled_by_query": "mock=1",
+    "enabled_by_default": false,
+    "data_dir": "data/mock",
+    "manifest": "data/mock/mock.json",
+    "files": {
+      "depthGather": "depthGather.symbol-{symbol_id}.json",
+      "depthGather_fallback": "depthGather.default.json"
+    }
+  }
+}

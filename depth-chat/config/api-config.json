@@ -1,7 +1,13 @@
 {
   "api_base": "http://18.177.36.184/futures",
-  "comment_api_base": "内网测试环境根路径，接口完整 URL = api_base + 路径，例如 /debug/depth",
+  "comment_api_base": "内网测试环境根路径；生产 host 见 hosts.production",
+  "hosts": {
+    "production": "https://contract.chishee.com",
+    "comment": "depth-chat 内硬编码的生产 host，mock=1 时全部走 data/mock/*.json"
+  },
   "endpoints": {
+    "exchangeInfo": "/pub/exchangeInfo",
+    "tickerList": "/pub/v2/tickerList",
     "depth": "/debug/depth",
     "klineDiff": "/debug/klineDiff",
     "depthGather": "/debug/depthGather",
@@ -12,16 +18,23 @@
     "enabled_by_query": "mock=1",
     "enabled_by_default": false,
     "data_dir": "data/mock",
+    "manifest": "data/mock/mock.json",
     "files": {
+      "exchangeInfo": "exchangeInfo.json",
+      "tickerList": "tickerList.json",
       "depth": "depth.symbol-{symbol_id}.json",
       "depth_fallback": "depth.default.json",
       "klineDiff": "klineDiff.symbol-{symbol_id}.json",
-      "klineDiff_fallback": "klineDiff.default.json"
+      "klineDiff_fallback": "klineDiff.default.json",
+      "depthGather": "depthGather.symbol-{symbol_id}.json",
+      "depthGather_fallback": "depthGather.default.json",
+      "exchangePrice": "exchangePrice.json",
+      "priceHash": "priceHash.json"
     }
   },
   "notes": [
-    "mock=1 时 /debug/depth 与 /debug/klineDiff 走本地 JSON，不请求 api_base",
+    "mock=1 时 contract.chishee.com 全部 7 个接口走本地 JSON，详见 data/mock/mock.json",
     "未命中 symbol 专用文件时使用 *.default.json",
-    "depth-chat.html 本体与 smoneyfuturesservice 同步；mock 仅通过 head 注入脚本启用"
+    "币安深度等外网接口不在 mock 范围，离线时该区块为空属预期"
   ]
 }
