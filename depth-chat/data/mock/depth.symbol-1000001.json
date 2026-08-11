@@ -1,0 +1,678 @@
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "depth": {
+      "ask": [
+        {
+          "price": 64130.2,
+          "trust_id": 900001,
+          "rest_qty": 100,
+          "number": 0.1,
+          "user_id": 10001,
+          "action": 0,
+          "source": 1,
+          "intval_time": "3s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 100,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64130.5,
+          "trust_id": 900002,
+          "rest_qty": 150,
+          "number": 0.15,
+          "user_id": 10002,
+          "action": 0,
+          "source": 3,
+          "intval_time": "4s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 150,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64130.8,
+          "trust_id": 900003,
+          "rest_qty": 200,
+          "number": 0.2,
+          "user_id": 10003,
+          "action": 0,
+          "source": 1,
+          "intval_time": "5s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 200,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64131.1,
+          "trust_id": 900004,
+          "rest_qty": 250,
+          "number": 0.25,
+          "user_id": 10004,
+          "action": 0,
+          "source": 3,
+          "intval_time": "6s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 250,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64131.4,
+          "trust_id": 900005,
+          "rest_qty": 300,
+          "number": 0.3,
+          "user_id": 10005,
+          "action": 0,
+          "source": 1,
+          "intval_time": "7s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 300,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64131.7,
+          "trust_id": 900006,
+          "rest_qty": 350,
+          "number": 0.35,
+          "user_id": 10001,
+          "action": 0,
+          "source": 3,
+          "intval_time": "8s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 350,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64132.0,
+          "trust_id": 900007,
+          "rest_qty": 400,
+          "number": 0.4,
+          "user_id": 10002,
+          "action": 0,
+          "source": 1,
+          "intval_time": "9s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 400,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64132.3,
+          "trust_id": 900008,
+          "rest_qty": 450,
+          "number": 0.45,
+          "user_id": 10003,
+          "action": 0,
+          "source": 3,
+          "intval_time": "10s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 450,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64132.6,
+          "trust_id": 900009,
+          "rest_qty": 500,
+          "number": 0.5,
+          "user_id": 10004,
+          "action": 0,
+          "source": 1,
+          "intval_time": "11s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 500,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64132.9,
+          "trust_id": 900010,
+          "rest_qty": 550,
+          "number": 0.55,
+          "user_id": 10005,
+          "action": 0,
+          "source": 3,
+          "intval_time": "12s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 550,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64133.2,
+          "trust_id": 900011,
+          "rest_qty": 600,
+          "number": 0.6,
+          "user_id": 10001,
+          "action": 0,
+          "source": 1,
+          "intval_time": "13s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 600,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64133.5,
+          "trust_id": 900012,
+          "rest_qty": 650,
+          "number": 0.65,
+          "user_id": 10002,
+          "action": 0,
+          "source": 3,
+          "intval_time": "14s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 1,
+            "type": 1,
+            "qty": 650,
+            "margin": "10",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        }
+      ],
+      "bid": [
+        {
+          "price": 64128.0,
+          "trust_id": 900013,
+          "rest_qty": 120,
+          "number": 0.12,
+          "user_id": 20001,
+          "action": 1,
+          "source": 2,
+          "intval_time": "2s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 120,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64127.7,
+          "trust_id": 900014,
+          "rest_qty": 165,
+          "number": 0.165,
+          "user_id": 20002,
+          "action": 0,
+          "source": 2,
+          "intval_time": "3s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 165,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64127.4,
+          "trust_id": 900015,
+          "rest_qty": 210,
+          "number": 0.21,
+          "user_id": 20003,
+          "action": 0,
+          "source": 2,
+          "intval_time": "4s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 210,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64127.1,
+          "trust_id": 900016,
+          "rest_qty": 255,
+          "number": 0.255,
+          "user_id": 20004,
+          "action": 0,
+          "source": 2,
+          "intval_time": "5s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 255,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64126.8,
+          "trust_id": 900017,
+          "rest_qty": 300,
+          "number": 0.3,
+          "user_id": 20001,
+          "action": 0,
+          "source": 2,
+          "intval_time": "6s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 300,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64126.5,
+          "trust_id": 900018,
+          "rest_qty": 345,
+          "number": 0.345,
+          "user_id": 20002,
+          "action": 0,
+          "source": 2,
+          "intval_time": "7s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 345,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64126.2,
+          "trust_id": 900019,
+          "rest_qty": 390,
+          "number": 0.39,
+          "user_id": 20003,
+          "action": 0,
+          "source": 2,
+          "intval_time": "8s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 390,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64125.9,
+          "trust_id": 900020,
+          "rest_qty": 435,
+          "number": 0.435,
+          "user_id": 20004,
+          "action": 0,
+          "source": 2,
+          "intval_time": "9s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 435,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64125.6,
+          "trust_id": 900021,
+          "rest_qty": 480,
+          "number": 0.48,
+          "user_id": 20001,
+          "action": 0,
+          "source": 2,
+          "intval_time": "10s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 480,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64125.3,
+          "trust_id": 900022,
+          "rest_qty": 525,
+          "number": 0.525,
+          "user_id": 20002,
+          "action": 0,
+          "source": 2,
+          "intval_time": "11s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 525,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64125.0,
+          "trust_id": 900023,
+          "rest_qty": 570,
+          "number": 0.57,
+          "user_id": 20003,
+          "action": 0,
+          "source": 2,
+          "intval_time": "12s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 570,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        },
+        {
+          "price": 64124.7,
+          "trust_id": 900024,
+          "rest_qty": 615,
+          "number": 0.615,
+          "user_id": 20004,
+          "action": 0,
+          "source": 2,
+          "intval_time": "13s",
+          "date": "2026-08-11 12:00:00",
+          "liquidated": 0,
+          "trust_info": {
+            "pid": 2,
+            "type": 1,
+            "qty": 615,
+            "margin": "12",
+            "done": "0",
+            "mark": "64129.1",
+            "fee": "0.0002",
+            "cmd": 0,
+            "ip": "127.0.0.1"
+          }
+        }
+      ]
+    },
+    "stats": {
+      "ask_price": 64130.2,
+      "bid_price": 64128.0,
+      "mark_price": 64129.1,
+      "diff_price": 0.34,
+      "diff_rate": 0.34,
+      "ask_qty": 4.5,
+      "bid_qty": 4.41,
+      "uid_num": 8,
+      "order_num": 24,
+      "max_price": 64133.5,
+      "min_price": 64124.7
+    },
+    "asks": [
+      [
+        64130.2,
+        0.1
+      ],
+      [
+        64130.5,
+        0.25
+      ],
+      [
+        64130.8,
+        0.45
+      ],
+      [
+        64131.1,
+        0.7
+      ],
+      [
+        64131.4,
+        1.0
+      ],
+      [
+        64131.7,
+        1.35
+      ],
+      [
+        64132.0,
+        1.75
+      ],
+      [
+        64132.3,
+        2.2
+      ],
+      [
+        64132.6,
+        2.7
+      ],
+      [
+        64132.9,
+        3.25
+      ],
+      [
+        64133.2,
+        3.85
+      ],
+      [
+        64133.5,
+        4.5
+      ]
+    ],
+    "bids": [
+      [
+        64128.0,
+        0.12
+      ],
+      [
+        64127.7,
+        0.285
+      ],
+      [
+        64127.4,
+        0.495
+      ],
+      [
+        64127.1,
+        0.75
+      ],
+      [
+        64126.8,
+        1.05
+      ],
+      [
+        64126.5,
+        1.395
+      ],
+      [
+        64126.2,
+        1.785
+      ],
+      [
+        64125.9,
+        2.22
+      ],
+      [
+        64125.6,
+        2.7
+      ],
+      [
+        64125.3,
+        3.225
+      ],
+      [
+        64125.0,
+        3.795
+      ],
+      [
+        64124.7,
+        4.41
+      ]
+    ],
+    "depth_analyze": "_00.02 : 0.0 / 0.0 <br/>_00.05 : 0.0 / 0.0 <br/>_00.10 : 0.0 / 0.0 <br/>_00.20 : 0.01 / 0.01 <br/>_00.50 : 0.02 / 0.02 <br/>_01.00 : 0.04 / 0.04 <br/>"
+  }
+}

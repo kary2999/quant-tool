@@ -1,0 +1,27 @@
+{
+  "api_base": "http://18.177.36.184/futures",
+  "comment_api_base": "内网测试环境根路径，接口完整 URL = api_base + 路径，例如 /debug/depth",
+  "endpoints": {
+    "depth": "/debug/depth",
+    "klineDiff": "/debug/klineDiff",
+    "depthGather": "/debug/depthGather",
+    "exchangePrice": "/debug/exchangePrice",
+    "priceHash": "/debug/priceHash"
+  },
+  "mock": {
+    "enabled_by_query": "mock=1",
+    "enabled_by_default": false,
+    "data_dir": "data/mock",
+    "files": {
+      "depth": "depth.symbol-{symbol_id}.json",
+      "depth_fallback": "depth.default.json",
+      "klineDiff": "klineDiff.symbol-{symbol_id}.json",
+      "klineDiff_fallback": "klineDiff.default.json"
+    }
+  },
+  "notes": [
+    "mock=1 时 /debug/depth 与 /debug/klineDiff 走本地 JSON，不请求 api_base",
+    "未命中 symbol 专用文件时使用 *.default.json",
+    "depth-chat.html 本体与 smoneyfuturesservice 同步；mock 仅通过 head 注入脚本启用"
+  ]
+}

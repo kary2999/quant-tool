@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度聚合 · 纵向深度分析</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"
+            integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+            integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+            crossorigin="anonymous"></script>
+    <script src="https://static.topcreditbank.com/2023/0719/highcharts.js"></script>
+    <script src="https://static.topcreditbank.com/2023/0719/exporting.js"></script>
+    <script src="https://static.topcreditbank.com/2023/0719/zh_cn-1.4.0.min.js"></script>
+    <script src="https://static.topcreditbank.com/2023/0719/w72sHD1689763738672.js"></script>
+
+    <style>
+        :root {
+            --bg: #0d1117;
+            --bg2: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --dim: #8b949e;
+            --ask: #ef4444;
+            --bid: #10b981;
+            --accent: #58a6ff;
+            --warn: #f0883e;
+        }
+
+        * { box-sizing: border-box; }
+        html, body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 13px;
+        }
+
+        .page { max-width: 1400px; margin: 0 auto; padding: 8px 12px 16px; }
+
+        /* 顶栏 */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .toolbar .form-control {
+            height: 30px;
+            background: #1c2333;
+            border-color: var(--border);
+            color: var(--text);
+            font-size: 12px;
+        }
+        .toolbar .btn {
+            height: 30px;
+            font-size: 12px;
+        }
+        .toolbar .btn-refresh-on {
+            background: #238636;
+            border-color: #2ea043;
+            color: #fff;
+        }
+        #stats_info {
+            margin-left: auto;
+            font-size: 13px;
+            line-height: 1.5;
+            text-align: right;
+        }
+        .red { color: var(--ask); }
+        .green { color: var(--bid); }
+        .blue { color: var(--accent); }
+        .orange { color: var(--warn); }
+
+        /* 纵向深度图区域 */
+        .chart-panel {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        .chart-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--dim);
+        }
+        .chart-head strong { color: var(--text); font-size: 13px; }
+        .chart-legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 14px;
+        }
+        .chart-legend i {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+        .leg-bid { background: rgba(16, 185, 129, 0.85); }
+        .leg-ask { background: rgba(239, 68, 68, 0.85); }
+
+        /* 纵向：价格沿 Y 轴向上递增，买卖盘向左右展开 */
+        #container {
+            width: 100%;
+            height: 520px;
+            min-height: 360px;
+        }
+
+        /* 聚合表格 */
+        .tables-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .table-panel {
+            flex: 1;
+            min-width: 320px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .table-panel .panel-title {
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+        .table-panel.ask .panel-title { color: var(--ask); background: rgba(239, 68, 68, 0.08); }
+        .table-panel.bid .panel-title { color: var(--bid); background: rgba(16, 185, 129, 0.08); }
+
+        .table-panel table {
+            margin: 0;
+            width: 100%;
+            color: var(--text);
+        }
+        .table-panel th {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            background: #1c2333;
+            border-color: var(--border) !important;
+            color: var(--dim);
+            padding: 6px 8px !important;
+        }
+        .table-panel td {
+            text-align: center;
+            font-size: 12px;
+            font-family: 'SF Mono', Consolas, monospace;
+            padding: 5px 8px !important;
+            border-color: var(--border) !important;
+            vertical-align: middle !important;
+        }
+        .table-panel tbody tr:hover td {
+            background: rgba(88, 166, 255, 0.1) !important;
+        }
+        .table-panel.ask tbody tr { background: rgba(239, 68, 68, 0.04); }
+        .table-panel.bid tbody tr { background: rgba(16, 185, 129, 0.04); }
+
+        @media (max-width: 768px) {
+            #container { height: 400px; }
+            #stats_info { margin-left: 0; width: 100%; text-align: left; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <div class="toolbar">
+        <button type="button" onclick="timeGetMarket()" class="btn btn-default" id="timeGetMarket" tag="5" num="0">定时刷新</button>
+        <input type="text" id="symbol_id" name="symbol_id" value="1000001" placeholder="symbol_id"
+               class="form-control" style="width:100px;">
+        <select id="market_monitor" class="form-control" style="width:200px;">
+            <option value="http://18.177.36.184/futures/debug/depthGather" selected>测试环境 depthGather</option>
+        </select>
+        <div id="stats_info"></div>
+    </div>
+
+    <!-- 纵向深度分析图：价格 Y 轴 · 累计量左右展开 -->
+    <div class="chart-panel">
+        <div class="chart-head">
+            <div>
+                <strong id="chart_title">纵向深度分析</strong>
+                <span class="chart-legend">
+                    <span><i class="leg-bid"></i>买盘 ←</span>
+                    <span><i class="leg-ask"></i>→ 卖盘</span>
+                </span>
+            </div>
+            <span id="chart_sub">价格 · 纵轴 &nbsp;|&nbsp; 累计深度 · 横轴</span>
+        </div>
+        <div id="container"></div>
+    </div>
+
+    <div class="tables-row">
+        <div class="table-panel ask">
+            <div class="panel-title">卖盘聚合 ASK · UV / Qty / Price</div>
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr><th>UV</th><th>Qty</th><th>Price</th></tr>
+                </thead>
+                <tbody id="market_monitor_tr_ask_list"></tbody>
+            </table>
+        </div>
+        <div class="table-panel bid">
+            <div class="panel-title">买盘聚合 BID · Price / Qty / UV</div>
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr><th>Price</th><th>Qty</th><th>UV</th></tr>
+                </thead>
+                <tbody id="market_monitor_tr_bid_list"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var timer;
+    var timerV2;
+    var bidsData;
+    var asksData;
+
+    const commonColors = [
+        "#FF5733", "#FFC300", "#00A8E8", "#003366", "#6A1B9A",
+        "#00C851", "#900C3F", "#C70039", "#0099CC", "#FF8800"
+    ];
+
+    function getColorCodeFromUID(uid) {
+        return commonColors[uid % commonColors.length];
+    }
+
+    /**
+     * 纵向深度图配置
+     * inverted: true → X 轴为纵向(价格)，Y 轴为横向(累计量)
+     * 买盘取负值向左，卖盘正值向右
+     */
+    var depthObject = {
+        chart: {
+            type: 'area',
+            inverted: true,
+            height: 500,
+            backgroundColor: '#161b22',
+            spacing: [12, 16, 12, 12],
+            animation: { duration: 300 }
+        },
+        title: { text: null },
+        credits: { enabled: false },
+        xAxis: {
+            title: {
+                text: '价格 Price',
+                style: { color: '#8b949e', fontSize: '11px' }
+            },
+            gridLineColor: '#21262d',
+            lineColor: '#30363d',
+            tickColor: '#484f58',
+            labels: { style: { color: '#8b949e', fontSize: '10px' } }
+        },
+        yAxis: {
+            title: {
+                text: '累计深度 Cumulative',
+                style: { color: '#8b949e', fontSize: '11px' }
+            },
+            gridLineColor: '#21262d',
+            lineColor: '#30363d',
+            tickColor: '#484f58',
+            labels: {
+                style: { color: '#8b949e', fontSize: '10px' },
+                formatter: function () {
+                    return Math.abs(this.value);
+                }
+            },
+            plotLines: [{
+                value: 0,
+                color: '#58a6ff',
+                width: 1,
+                zIndex: 4
+            }]
+        },
+        legend: { enabled: false },
+        plotOptions: {
+            area: {
+                fillOpacity: 0.35,
+                lineWidth: 1.5,
+                step: 'center',
+                marker: { enabled: false }
+            }
+        },
+        tooltip: {
+            shared: false,
+            backgroundColor: 'rgba(22, 27, 34, 0.95)',
+            borderColor: '#484f58',
+            borderRadius: 6,
+            style: { color: '#e6edf3', fontSize: '12px' },
+            formatter: function () {
+                var side = this.series.name;
+                var vol = Math.abs(this.y);
+                return '<b>' + side + '</b><br/>价格: <b>' + this.x + '</b><br/>累计量: <b>' + vol + '</b>';
+            }
+        },
+        series: [
+            {
+                type: 'area',
+                name: '买盘',
+                color: '#10b981',
+                data: []
+            },
+            {
+                type: 'area',
+                name: '卖盘',
+                color: '#ef4444',
+                data: []
+            }
+        ]
+    };
+
+    var chart = Highcharts.chart('container', depthObject);
+
+    /** 累计深度 [price, cumVol] → 纵向图 [price, ±cumVol] */
+    function toVerticalSeries(levels, sign) {
+        if (!levels || !levels.length) return [];
+        return levels.map(function (pt) {
+            var price = parseFloat(pt[0]);
+            var vol = parseFloat(pt[1]);
+            return [price, sign * vol];
+        });
+    }
+
+    function depthChatChange(asksDepthData, bidsDepthData) {
+        var sid = $('#symbol_id').val();
+        $('#chart_title').text('纵向深度分析 · ' + sid);
+
+        chart.series[0].setData(toVerticalSeries(bidsDepthData, -1), false);
+        chart.series[1].setData(toVerticalSeries(asksDepthData, 1), false);
+        chart.redraw();
+    }
+
+    function timeGetMarket() {
+        var tag = $('#timeGetMarket').attr('tag');
+        if (tag == 1) {
+            $('#timeGetMarket').attr('num', 0).attr('tag', 0)
+                .removeClass('btn-refresh-on').html('定时刷新');
+            clearInterval(timer);
+            clearInterval(timerV2);
+        } else {
+            $('#timeGetMarket').attr('tag', 1).addClass('btn-refresh-on');
+            timer = setInterval(function () {
+                getMarketData();
+                $('#timeGetMarket').attr('num', 0);
+            }, 500);
+            timerV2 = setInterval(function () {
+                var num = parseInt($('#timeGetMarket').attr('num'), 10) + 1;
+                $('#timeGetMarket').html('停止刷新 (' + num + 's)').attr('num', num);
+            }, 1000);
+            getMarketData();
+        }
+    }
+
+    function getMarketData() {
+        var market_monitor_url = $('#market_monitor').val();
+        var symbol_id = $('#symbol_id').val();
+
+        $.ajax({
+            url: market_monitor_url + '?symbol_id=' + symbol_id,
+            processData: false,
+            dataType: 'json',
+            async: true,
+            success: function (json) {
+                var source_list = [];
+                source_list[1] = "glyphicon glyphicon-blackboard";
+                source_list[2] = "glyphicon glyphicon-phone";
+                source_list[3] = "glyphicon glyphicon-compressed";
+                source_list[4] = "glyphicon glyphicon-alert";
+                source_list[5] = "glyphicon glyphicon-link";
+                source_list[0] = "glyphicon glyphicon-tint";
+
+                var stats_info = json.data['stats'];
+                var htmlString =
+                    "<div style='display:inline-block;text-align:left;margin-right:12px;'>" +
+                    "  <span class='red'>AP " + stats_info['ask_price'] + "</span> / " +
+                    "  <span class='green'>BP " + stats_info['bid_price'] + "</span><br/>" +
+                    "  <span class='blue'>MP " + stats_info['mark_price'] + "</span> / " +
+                    "  <span class='orange'>Cap " + stats_info['diff_price'] + "‱</span>" +
+                    "</div>" +
+                    "<div style='display:inline-block;text-align:left;'>" +
+                    "  <span class='red'>AV -" + stats_info['ask_qty'] + "</span> / " +
+                    "  <span class='green'>BV +" + stats_info['bid_qty'] + "</span><br/>" +
+                    "  <span class='blue'>UV " + stats_info['uid_num'] + "</span> / " +
+                    "  <span class='orange'>TV " + stats_info['order_num'] + "</span>" +
+                    "</div>";
+                $('#stats_info').html(htmlString);
+
+                var market_monitor_list = json.data['depth'];
+                asksData = json.data['asks'];
+                bidsData = json.data['bids'];
+                depthChatChange(asksData, bidsData);
+
+                var trString = '';
+                for (var j in market_monitor_list['ask']) {
+                    var trust_info = market_monitor_list['ask'][j];
+                    var divStr = '';
+                    for (var x in trust_info['source_list']) {
+                        divStr += '<span class="' + source_list[x] + '"></span>';
+                    }
+                    var color = getColorCodeFromUID(trust_info['uid_num']);
+                    trString += "<tr data-html='true' data-toggle='tooltip' data-placement='bottom' title='" + divStr + "'>";
+                    trString += "<td style='color:" + color + "'>" + trust_info['uid_num'] + "</td>";
+                    trString += "<td>" + trust_info['number'] + "</td>";
+                    trString += "<td>" + trust_info['price'] + "</td>";
+                    trString += "</tr>";
+                }
+                $('#market_monitor_tr_ask_list').html(trString);
+
+                trString = '';
+                for (var k in market_monitor_list['bid']) {
+                    var bid_info = market_monitor_list['bid'][k];
+                    divStr = '';
+                    for (var y in bid_info['source_list']) {
+                        divStr += '<span class="' + source_list[y] + '"></span>';
+                    }
+                    color = getColorCodeFromUID(bid_info['uid_num']);
+                    trString += "<tr data-html='true' data-toggle='tooltip' data-placement='bottom' title='" + divStr + "'>";
+                    trString += "<td>" + bid_info['price'] + "</td>";
+                    trString += "<td>" + bid_info['number'] + "</td>";
+                    trString += "<td style='color:" + color + "'>" + bid_info['uid_num'] + "</td>";
+                    trString += "</tr>";
+                }
+                $('#market_monitor_tr_bid_list').html(trString);
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+        });
+    }
+
+    $(function () {
+        timeGetMarket();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "code": 0,
+  "msg": "mock",
+  "data": {
+    "stats": {
+      "ask_price": 65866.9,
+      "bid_price": 66427.2,
+      "mark_price": 64129.1,
+      "diff_price": 269.7,
+      "ask_qty": 3540.0,
+      "bid_qty": 3330.0,
+      "uid_num": 3,
+      "order_num": 120
+    },
+    "depth": {
+      "ask": {
+        "65866.9": { "price": "65866.9", "number": "10", "uid_num": 2, "direction": -1, "source_list": [1] },
+        "65900.0": { "price": "65900.0", "number": "25", "uid_num": 1, "direction": -1, "source_list": [1] }
+      },
+      "bid": {
+        "66427.2": { "price": "66427.2", "number": "12", "uid_num": 1, "direction": 1, "source_list": [1] },
+        "66300.0": { "price": "66300.0", "number": "30", "uid_num": 2, "direction": 1, "source_list": [2] }
+      }
+    },
+    "asks": [[65866.9, 35], [65900.0, 80]],
+    "bids": [[66427.2, 42], [66300.0, 95]]
+  }
+}

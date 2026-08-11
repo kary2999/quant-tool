@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "description": "铺单工具外部配置 — depth 页不使用此文件",
+  "defaults": {
+    "symbol_id": "1000001",
+    "mark_price": 64129.1,
+    "refresh_interval_ms": 500
+  },
+  "endpoints": {
+    "depth": {
+      "options": [
+        { "label": "DEV1", "url": "https://contract.hxexchge.com/debug/depth" },
+        { "label": "生产", "url": "https://contract.chishee.com/debug/depth" },
+        { "label": "测试", "url": "http://18.177.36.184/futures/debug/depth" }
+      ],
+      "default_index": 0
+    }
+  },
+  "mock": {
+    "enabled": false,
+    "depth": "data/mock-depth.json"
+  },
+  "market_making": {
+    "file": "data/symbol-1000001.json"
+  }
+}

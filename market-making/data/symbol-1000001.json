@@ -1,0 +1,33 @@
+{
+  "symbol": {
+    "pid": 1,
+    "symbol_id": 1000001,
+    "symbol": "btc_usdt",
+    "show_name": "BTC 铺单",
+    "contract_value": 0.001,
+    "price_precision": 1,
+    "number_precision": 3,
+    "price_step": 0.1,
+    "mark_price": 64129.1
+  },
+  "boxes": [
+    { "box_id": 1, "pid": 1, "direction": -1, "dom": 1, "trust_num": 10, "price_float": "100.005-100.3", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 2, "pid": 1, "direction": -1, "dom": 2, "trust_num": 10, "price_float": "100.3-100.5", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 3, "pid": 1, "direction": -1, "dom": 3, "trust_num": 10, "price_float": "100.5-100.8", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 4, "pid": 1, "direction": -1, "dom": 4, "trust_num": 10, "price_float": "100.8-101.2", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 5, "pid": 1, "direction": -1, "dom": 5, "trust_num": 10, "price_float": "101.2-102", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 6, "pid": 1, "direction": -1, "dom": 6, "trust_num": 30, "price_float": "102-103", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 7, "pid": 1, "direction": -1, "dom": 7, "trust_num": 30, "price_float": "103-105", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 8, "pid": 1, "direction": -1, "dom": 8, "trust_num": 30, "price_float": "105-110", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 9, "pid": 1, "direction": -1, "dom": 9, "trust_num": 30, "price_float": "110-120", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 10, "pid": 1, "direction": 1, "dom": 1, "trust_num": 10, "price_float": "99.7-99.995", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 11, "pid": 1, "direction": 1, "dom": 2, "trust_num": 10, "price_float": "99.7-99.5", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 12, "pid": 1, "direction": 1, "dom": 3, "trust_num": 10, "price_float": "99.5-99.2", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 13, "pid": 1, "direction": 1, "dom": 4, "trust_num": 10, "price_float": "99.2-98.8", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 14, "pid": 1, "direction": 1, "dom": 5, "trust_num": 10, "price_float": "98.8-98", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 15, "pid": 1, "direction": 1, "dom": 6, "trust_num": 30, "price_float": "98-97", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 16, "pid": 1, "direction": 1, "dom": 7, "trust_num": 30, "price_float": "97-95", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 17, "pid": 1, "direction": 1, "dom": 8, "trust_num": 30, "price_float": "95-90", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 },
+    { "box_id": 18, "pid": 1, "direction": 1, "dom": 9, "trust_num": 30, "price_float": "90-80", "number_float": "10000-10000", "change_trust_num": 0, "change_number_float": "1-100", "change_survival_time": "3-10", "status": 1 }
+  ]
+}
