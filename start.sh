@@ -13,6 +13,7 @@ echo "  入口:     http://localhost:${PORT}/"
 echo "  铺单工具: http://localhost:${PORT}/market-making/index.html"
 echo "  深度 V4:  http://localhost:${PORT}/depth-chat/depth-chat.html"
 echo "  深度聚合: http://localhost:${PORT}/depth-gather/depthGather-chat.html"
+echo "  深度对比: http://localhost:${PORT}/depth-compare/depthCompare-chat.html"
 echo ""
 
 cd "$ROOT"

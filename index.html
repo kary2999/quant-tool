@@ -3,78 +3,353 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>量化展示工具</title>
+  <title>量化可视化工具集</title>
+  <meta name="description" content="深度、铺单、K 线回测的纯前端可视化工具集，默认内置 Mock 数据，打开即用。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📈</text></svg>">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      /* 颜色：一个主色 + 中性灰阶 + 语义色 */
+      --bg:        #0d1117;
+      --bg-raised: #161b22;
+      --bg-sunken: #010409;
+      --bg-subtle: #21262d;
+      --border:       #30363d;
+      --border-strong:#3d444d;
+      --text:       #e6edf3;
+      --text-dim:   #9198a1;
+      --text-faint: #6e7681;
+      --accent:      #58a6ff;
+      --accent-dim:  rgba(88, 166, 255, .12);
+      --ok:      #3fb950;
+      --ok-dim:  rgba(63, 185, 80, .12);
+      --warn:     #d29922;
+      --warn-dim: rgba(210, 153, 34, .12);
+
+      /* 间距：4px 刻度 */
+      --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+      --sp-6: 24px; --sp-8: 32px; --sp-12: 48px; --sp-16: 64px;
+
+      /* 圆角 */
+      --r-sm: 6px; --r-md: 8px; --r-lg: 16px; --r-pill: 9999px;
+
+      /* 字阶 */
+      --fs-display: 32px; --fs-h2: 22px; --fs-h3: 17px;
+      --fs-body: 15px; --fs-small: 13px; --fs-caption: 12px;
+
+      /* 阴影 */
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.24), 0 2px 6px rgba(0,0,0,.16);
+      --shadow-lg: 0 4px 6px rgba(0,0,0,.20), 0 16px 32px rgba(0,0,0,.32);
+
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC',
+              'HarmonyOS Sans', 'Source Han Sans SC', 'Segoe UI', sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+      --ease: 160ms ease-out;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
+      font-family: var(--font);
+      font-size: var(--fs-body);
+      line-height: 1.6;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 40px 24px;
+      padding: var(--sp-12) var(--sp-6) var(--sp-16);
+      -webkit-font-smoothing: antialiased;
     }
-    h1 { font-size: 22px; margin-bottom: 8px; color: #58a6ff; }
-    .sub { color: #8b949e; font-size: 13px; margin-bottom: 32px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; max-width: 960px; }
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      padding: 20px;
+
+    .wrap { max-width: 1080px; margin: 0 auto; }
+
+    /* ---------- 页头 ---------- */
+    .masthead {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--sp-6);
+      flex-wrap: wrap;
+      margin-bottom: var(--sp-6);
+    }
+    h1 {
+      font-size: var(--fs-display);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -.02em;
+      margin-bottom: var(--sp-2);
+    }
+    .lede {
+      color: var(--text-dim);
+      font-size: var(--fs-body);
+      max-width: 62ch;
+    }
+    .repo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      padding: var(--sp-2) var(--sp-3);
+      min-height: 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      background: var(--bg-raised);
+      color: var(--text-dim);
+      font-size: var(--fs-small);
       text-decoration: none;
-      color: inherit;
-      transition: border-color .15s;
+      transition: border-color var(--ease), color var(--ease);
+      white-space: nowrap;
     }
-    .card:hover { border-color: #58a6ff; }
-    .card h2 { font-size: 16px; margin-bottom: 8px; }
-    .card p { font-size: 13px; color: #8b949e; line-height: 1.5; margin-bottom: 12px; }
+    .repo-link:hover  { border-color: var(--border-strong); color: var(--text); }
+    .repo-link:active { background: var(--bg-subtle); }
+
+    /* ---------- Mock 提示条 ---------- */
+    .notice {
+      display: flex;
+      gap: var(--sp-3);
+      padding: var(--sp-3) var(--sp-4);
+      margin-bottom: var(--sp-8);
+      background: var(--ok-dim);
+      border: 1px solid rgba(63, 185, 80, .28);
+      border-radius: var(--r-md);
+      font-size: var(--fs-small);
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+    .notice b { color: var(--ok); font-weight: 600; }
+    .notice-icon { color: var(--ok); flex-shrink: 0; }
+
+    /* ---------- 卡片网格 ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: var(--sp-4);
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: var(--sp-6);
+      transition: border-color var(--ease), transform var(--ease), box-shadow var(--ease);
+    }
+    .card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    .card:focus-within { border-color: var(--accent); }
+
+    .tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-3); }
     .tag {
-      display: inline-block;
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      background: #21262d;
-      color: #8b949e;
-      margin-right: 6px;
+      font-size: var(--fs-caption);
+      line-height: 1.5;
+      padding: 0 var(--sp-2);
+      border-radius: var(--r-pill);
+      background: var(--bg-subtle);
+      border: 1px solid transparent;
+      color: var(--text-faint);
     }
-    .tag.src { color: #3fb950; border: 1px solid #238636; }
-    footer { margin-top: 40px; font-size: 12px; color: #6e7681; max-width: 960px; }
-    code { background: #21262d; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+    .tag--src   { color: var(--ok);     background: var(--ok-dim);     border-color: rgba(63,185,80,.3); }
+    .tag--frozen{ color: var(--warn);   background: var(--warn-dim);   border-color: rgba(210,153,34,.3); }
+    .tag--ext   { color: var(--accent); background: var(--accent-dim); border-color: rgba(88,166,255,.3); }
+
+    .card h2 { font-size: var(--fs-h3); font-weight: 600; line-height: 1.35; margin-bottom: var(--sp-2); }
+    .card h2 a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color var(--ease);
+    }
+    .card h2 a:hover { color: var(--accent); }
+    /* 让整张卡可点，同时不吞掉底部的次级链接 */
+    .card h2 a::after { content: ''; position: absolute; inset: 0; }
+    .card { position: relative; }
+
+    .card p {
+      font-size: var(--fs-small);
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: var(--sp-4);
+      flex: 1;
+    }
+
+    .card-foot {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-3);
+      padding-top: var(--sp-3);
+      border-top: 1px solid var(--border);
+    }
+    .link {
+      position: relative;
+      z-index: 1;
+      font-size: var(--fs-small);
+      color: var(--text-faint);
+      text-decoration: none;
+      transition: color var(--ease);
+    }
+    .link:hover { color: var(--accent); text-decoration: underline; }
+    .link--go { color: var(--accent); font-weight: 500; }
+
+    /* ---------- 页脚 ---------- */
+    footer {
+      margin-top: var(--sp-12);
+      padding-top: var(--sp-6);
+      border-top: 1px solid var(--border);
+      font-size: var(--fs-small);
+      color: var(--text-faint);
+      line-height: 1.9;
+    }
+    footer strong { color: var(--text-dim); font-weight: 600; }
+    code {
+      font-family: var(--font-mono);
+      font-size: var(--fs-caption);
+      background: var(--bg-sunken);
+      border: 1px solid var(--border);
+      padding: 1px var(--sp-1);
+      border-radius: var(--r-sm);
+      color: var(--text-dim);
+    }
+
+    @media (max-width: 600px) {
+      body { padding: var(--sp-8) var(--sp-4) var(--sp-12); }
+      h1 { font-size: 26px; }
+      .grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <h1>量化展示工具</h1>
-  <p class="sub">从 quant-admin / smoneyfuturesservice 提取的独立静态页面，本地 HTTP 服务即可使用。</p>
+<div class="wrap">
 
-  <div class="grid">
-    <a class="card" href="market-making/demo.html">
-      <span class="tag src">quant-admin</span>
-      <span class="tag">铺单</span>
-      <h2>① MX 铺单工具</h2>
-      <p>铺单列表 + 深度图 + 网格配置。Mock：<code>data/symbol-1000001.json</code> + <code>js/mock-data.js</code>，见 demo 说明。</p>
+  <header class="masthead">
+    <div>
+      <h1>量化可视化工具集</h1>
+      <p class="lede">
+        深度、铺单、K 线回测的纯前端工具，无后端、无构建，打开网页即用。
+      </p>
+    </div>
+    <a class="repo-link" href="https://github.com/kary2999/quant-tool" target="_blank" rel="noopener"
+       aria-label="在 GitHub 上查看源码">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+                 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+                 -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
+                 .07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15
+                 -.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27
+                 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15
+                 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2
+                 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+      </svg>
+      kary2999/quant-tool
     </a>
+  </header>
 
-    <a class="card" href="depth-chat/demo.html">
-      <span class="tag src">smoneyfuturesservice</span>
-      <span class="tag">深度 V4</span>
-      <h2>② depth-chat</h2>
-      <p>深度服务 V4：本所 vs 币安深度对比、50 档表格、K 线。源码 sync 拷贝 + mock 配置（见 demo.html 说明）。</p>
-    </a>
-
-    <a class="card" href="depth-gather/README.md">
-      <span class="tag src">smoneyfuturesservice</span>
-      <span class="tag">聚合</span>
-      <span class="tag" style="color:#d29922;border-color:#9e6a03">封板</span>
-      <h2>③ depthGather-chat</h2>
-      <p>查看深度是否均匀：左订单簿逐档 Qty + 右纵向单档图。测试环境 / Mock 可切换。说明见 README.md。</p>
-    </a>
+  <div class="notice">
+    <span class="notice-icon" aria-hidden="true">●</span>
+    <span>
+      <b>全部工具默认使用 Mock 数据</b>，不依赖内网、不请求生产环境，在线直接浏览完整交互。
+      需要连真接口时：页面顶栏切换数据源下拉，或在网址后加 <code>?mock=0</code>（仅在能访问内网的环境下有效）。
+    </span>
   </div>
 
+  <main class="grid">
+
+    <article class="card">
+      <div class="tags">
+        <span class="tag tag--src">quant-admin</span>
+        <span class="tag">铺单</span>
+      </div>
+      <h2><a href="market-making/index.html">MX 铺单工具</a></h2>
+      <p>
+        铺单列表、网格配置与深度图三联视图。可按 pid 切换策略组，
+        调整标记价后实时重算各档挂单分布，也支持上传自己的 JSON 数据。
+      </p>
+      <div class="card-foot">
+        <a class="link link--go" href="market-making/index.html">打开工具 →</a>
+        <a class="link" href="market-making/demo.html">数据说明</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="tags">
+        <span class="tag tag--src">smoneyfuturesservice</span>
+        <span class="tag">深度 V4</span>
+      </div>
+      <h2><a href="depth-chat/depth-chat.html">depth-chat · 深度服务</a></h2>
+      <p>
+        本所与币安的深度对照：叠加深度图、50 档逐档对比表、滑点估算、
+        对标价格与 Price Hash 健康度，K 线可展开对比标记价与最新价。
+      </p>
+      <div class="card-foot">
+        <a class="link link--go" href="depth-chat/depth-chat.html">打开工具 →</a>
+        <a class="link" href="depth-chat/demo.html">接口与 Mock 说明</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="tags">
+        <span class="tag tag--src">smoneyfuturesservice</span>
+        <span class="tag">聚合</span>
+        <span class="tag tag--frozen">已封板</span>
+      </div>
+      <h2><a href="depth-gather/depthGather-chat.html">depthGather · 深度均匀度</a></h2>
+      <p>
+        专看一件事：挂单在各价位上铺得均不均匀。左侧订单簿逐档 Qty，
+        右侧纵向单档柱状图，一眼看出断档与堆量。功能已冻结，不再新增。
+      </p>
+      <div class="card-foot">
+        <a class="link link--go" href="depth-gather/depthGather-chat.html">打开工具 →</a>
+        <a class="link" href="depth-gather/demo.html">使用说明</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="tags">
+        <span class="tag tag--src">fork depth-gather</span>
+        <span class="tag">外所对比</span>
+      </div>
+      <h2><a href="depth-compare/depthCompare-chat.html">depthCompare · 外所对比</a></h2>
+      <p>
+        本所深度与 Binance、OKX、Bybit、KuCoin 横向对齐，统一精度后
+        比较同一价位区间的挂单厚度，判断自家盘口在市场中的相对位置。
+      </p>
+      <div class="card-foot">
+        <a class="link link--go" href="depth-compare/depthCompare-chat.html">打开工具 →</a>
+        <a class="link" href="https://github.com/kary2999/quant-tool/blob/main/depth-compare/README.md"
+           target="_blank" rel="noopener">README</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="tags">
+        <span class="tag tag--ext">独立项目</span>
+        <span class="tag">回测</span>
+      </div>
+      <h2>
+        <a href="https://kary2999.github.io/trade-backtest/" target="_blank" rel="noopener">
+          K 线回测
+        </a>
+      </h2>
+      <p>
+        基于币安公开行情的纯前端回测：导入成交 CSV 或用自然语言描述策略，
+        输出净盈亏、胜率、盈亏比、最大回撤与权益曲线，并给出最优下车点对比。
+      </p>
+      <div class="card-foot">
+        <a class="link link--go" href="https://kary2999.github.io/trade-backtest/"
+           target="_blank" rel="noopener">打开工具 →</a>
+        <a class="link" href="https://github.com/kary2999/trade-backtest"
+           target="_blank" rel="noopener">源码</a>
+      </div>
+    </article>
+
+  </main>
+
   <footer>
-    启动方式：<code>./start.sh</code> 或 <code>python3 -m http.server 8080</code><br>
-    Mock 总索引：<code>config/demo-mock.json</code><br>
-    同步 depth 页：<code>./sync.sh</code>（从 smoneyfuturesservice 重新拷贝）<br>
+    <strong>本地运行</strong>：<code>./start.sh</code>，然后访问 <code>http://localhost:8080/</code><br>
+    <strong>连真接口</strong>：网址加 <code>?mock=0</code>，或在页面顶栏切换数据源下拉<br>
+    <strong>Mock 总索引</strong>：<code>config/demo-mock.json</code>　·　
+    <strong>同步上游</strong>：<code>./sync.sh</code>　·　
     详细说明见 <code>README.md</code>
   </footer>
+
+</div>
 </body>
 </html>

@@ -1,17 +1,24 @@
 # 量化展示工具 · quant-visual-tools
 
-从 **quant-admin** 和 **smoneyfuturesservice** 提取的三套前端工具，打包为可独立运行的静态页面。  
-接口不可用时，铺单工具支持 **外部 JSON 配置** 离线演示。
+在线访问：**https://kary2999.github.io/quant-tool/**
+
+从 **quant-admin** 和 **smoneyfuturesservice** 提取的前端工具，打包为可独立运行的静态页面，无后端、无构建。
+
+> **全部工具默认使用 Mock 数据。** 公开页面既够不着内网接口，也不该去打生产域名，
+> 所以默认一律读本地 mock，打开即可看到完整交互。
+> 要连真接口：网址加 `?mock=0`，或在页面顶栏切换数据源下拉（仅在能访问内网的环境下有效）。
 
 ---
 
 ## 一、工具清单
 
-| # | 工具 | 源码位置 | 本地入口 |
-|---|------|----------|----------|
+| # | 工具 | 源码位置 | 入口 |
+|---|------|----------|------|
 | 1 | **MX 铺单工具** | `quant-admin` → `9527.php/mx_market_making_list` + `mx_market_making_box` | `/market-making/index.html` |
 | 2 | **深度服务 V4** | `smoneyfuturesservice/depth-chat.html` | `/depth-chat/depth-chat.html` |
-| 3 | **深度聚合** | `smoneyfuturesservice/depthGather-chat.html` | `/depth-gather/depthGather-chat.html` |
+| 3 | **深度聚合**（已封板） | `smoneyfuturesservice/depthGather-chat.html` | `/depth-gather/depthGather-chat.html` |
+| 4 | **外所深度对比** | fork 自 depth-gather | `/depth-compare/depthCompare-chat.html` |
+| 5 | **K 线回测**（独立仓库） | [kary2999/trade-backtest](https://github.com/kary2999/trade-backtest) | https://kary2999.github.io/trade-backtest/ |
 
 ---
 
@@ -31,7 +38,32 @@ chmod +x sync.sh start.sh
 
 浏览器打开：**http://localhost:8080/** （导航页）
 
-> 必须用 HTTP 服务，不能用 `file://` 直接打开（fetch / ajax 会被浏览器拦截）。
+**关于 `file://` 直接双击打开：** depth-chat 与 depth-gather 内置了 `js/mock-data.js`
+（把配置和 mock JSON 打包进 JS），所以双击也能看 mock 演示。
+但 market-making 的部分数据仍走 `fetch`，且真接口在 `file://` 下必被 CORS 拦，
+**要完整体验请用 `./start.sh`**。
+
+---
+
+## 二·五、GitHub Pages 部署
+
+仓库 `main` 分支根目录直接就是站点根目录，无需构建：
+
+1. GitHub → 仓库 **Settings** → 左侧 **Pages**
+2. **Source** 选 `Deploy from a branch`
+3. **Branch** 选 `main`，目录选 `/ (root)`，Save
+4. 等 1～2 分钟，访问 https://kary2999.github.io/quant-tool/
+
+根目录的 `.nojekyll` 用于跳过 Jekyll 处理（避免下划线开头的文件被忽略、加快发布）。
+
+**Pages 上哪些能用、哪些不能：**
+
+| 数据来源 | 状态 | 说明 |
+|----------|------|------|
+| 本地 mock JSON | ✅ 可用 | 默认数据源，全部工具 |
+| Binance / OKX / Bybit / KuCoin 公开行情 | ✅ 可用 | 公网 HTTPS，depth-chat 与 depth-compare 会真实拉取 |
+| 内网测试环境 `18.177.36.184` | ❌ 不可用 | 公网不可达；且 https 页面不允许请求 http（混合内容） |
+| 生产 `contract.chishee.com` | ❌ 不会请求 | 默认 mock 下不发起，公开页面不应触碰 |
 
 ---
 
@@ -169,12 +201,26 @@ quant-visual-tools/
 │   └── data/
 │       ├── symbol-1000001.json
 │       └── mock-depth.json
-├── depth-chat/             # ② 深度 V4（只拷贝，勿改）
-│   └── depth-chat.html
-└── depth-gather/           # ③ 深度均匀性（主页面封板）
-    ├── README.md           # 产品说明（推荐阅读）
-    ├── depthGather-chat.html
-    ├── demo.html           # Mock / 接口技术说明
+├── depth-chat/             # ② 深度 V4（页面只拷贝，勿改；周边 js/ 可改）
+│   ├── depth-chat.html
+│   ├── demo.html
+│   ├── js/
+│   │   ├── mock-data.js    # file:// 内嵌兜底（tools/gen-mock-data.py 生成）
+│   │   ├── api-config.js
+│   │   └── mock-bridge.js
+│   ├── data/mock/
+│   ├── tools/gen-mock-data.py
+│   └── test/
+│       ├── mock-smoke-test.js   # node 桩测试
+│       └── e2e-browser.js       # 真实 Chrome e2e（需 puppeteer-core）
+├── depth-gather/           # ③ 深度均匀性（主页面封板）
+│   ├── README.md           # 产品说明（推荐阅读）
+│   ├── depthGather-chat.html
+│   ├── demo.html           # Mock / 接口技术说明
+│   └── data/mock/
+└── depth-compare/          # ④ 外所深度对比
+    ├── README.md
+    ├── depthCompare-chat.html
     └── data/mock/
 ```
 
@@ -194,11 +240,15 @@ quant-visual-tools/
 
 总索引：**`config/demo-mock.json`**
 
-| 工具 | Demo 说明页 | Mock 数据目录 | 启用 |
-|------|-------------|---------------|------|
-| 铺单 | `market-making/demo.html` | `data/symbol-1000001.json` + `js/mock-data.js` | `?mock=1` |
-| depth-chat | `depth-chat/demo.html` | `depth-chat/data/mock/` | `?mock=1` |
-| depth-gather | `depth-gather/demo.html` | `depth-gather/data/mock/` | `?mock=1` |
+| 工具 | Demo 说明页 | Mock 数据目录 | 默认 | 关掉 mock |
+|------|-------------|---------------|------|-----------|
+| 铺单 | `market-making/demo.html` | `data/symbol-1000001.json` + `js/mock-data.js` | ✅ 开启 | `?mock=0` 或取消勾选「使用 Mock」 |
+| depth-chat | `depth-chat/demo.html` | `depth-chat/data/mock/` + `js/mock-data.js` | ✅ 开启 | `?mock=0` 或顶栏下拉 |
+| depth-gather | `depth-gather/demo.html` | `depth-gather/data/mock/` | ✅ 开启 | `?mock=0` 或顶栏下拉 |
+| depth-compare | — | `depth-compare/data/mock/` | ✅ 开启 | `?mock=0` 或顶栏下拉 |
+
+> 「默认 mock」这条规则实现在各自的 `js/mock-bridge.js`（铺单在 `config/config-loader.js`），
+> 判断只有一行：除非 `?mock=0`，否则一律 mock。
 
 **depth-gather mock 文件：**
 
