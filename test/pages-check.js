@@ -6,7 +6,8 @@
  */
 const puppeteer = require('puppeteer-core');
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const BASE = 'http://localhost:8123';
+// 默认测本地静态服务；传 BASE 可直接测线上 Pages
+const BASE = (process.env.BASE || 'http://localhost:8123').replace(/\/$/, '');
 
 // 这些域名在 GitHub Pages 上要么不可达，要么根本不该碰
 const FORBIDDEN = /18\.177\.36\.184|contract\.chishee\.com|contract\.hxexchge\.com|127\.0\.0\.1(?!:8123)/;
