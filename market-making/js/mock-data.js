@@ -35,11 +35,11 @@
       endpoints: {
         depth: {
           options: [
-            { label: 'Mock 本地', url: 'http://127.0.0.1/debug/depth' },
+            { label: 'Mock 本地', url: 'mock://depth' },
             { label: 'DEV1', url: 'https://contract.hxexchge.com/debug/depth' },
             { label: '测试', url: 'http://18.177.36.184/futures/debug/depth' }
           ],
-          default_index: 0
+          default_index: 1
         }
       },
       mock: {

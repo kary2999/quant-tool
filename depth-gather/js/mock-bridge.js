@@ -11,6 +11,7 @@
   var MOCK_URL = 'mock://depthGather';
   var DEFAULT_LIVE = 'http://18.177.36.184/futures/debug/depthGather';
   var patched = false;
+  var builtOnce = false;
   var cfg = null;
 
   function parseQuery() {
@@ -48,9 +49,19 @@
     return document.getElementById('market_monitor');
   }
 
+  /**
+   * 默认走 mock。理由：本页要发布到 GitHub Pages，
+   * 公网既够不着内网 18.177.36.184，https 页面也不允许请求 http（混合内容）。
+   * 要真接口：URL 加 ?mock=0，或顶栏下拉切「测试环境」。
+   */
+  function preferMockDefault() {
+    var q = parseQuery();
+    return !(q.mock === '0' || q.mock === 'false');
+  }
+
   function isMockSelected() {
     var sel = getSelect();
-    if (!sel || sel.selectedIndex < 0) return false;
+    if (!sel || sel.selectedIndex < 0) return preferMockDefault();
     var opt = sel.options[sel.selectedIndex];
     return opt && opt.getAttribute('data-mock') === '1';
   }
@@ -88,6 +99,10 @@
         if (!r2.ok) throw new Error('mock missing: ' + paths.primary);
         return r2.json();
       });
+    }).catch(function (err) {
+      var embedded = global.QUANT_DG_MOCK && global.QUANT_DG_MOCK.depthGather;
+      if (embedded) return embedded;
+      throw err;
     });
   }
 
@@ -118,8 +133,10 @@
     var sel = getSelect();
     if (!sel) return;
 
+    // HTML 里本来就写死了 option，不能用 selectedIndex 判断「用户是否选过」，
+    // 否则 preferMock 永远进不去；用 builtOnce 区分首次构建与后续重建。
     var prevMock = isMockSelected();
-    var hadSelection = sel.selectedIndex >= 0;
+    var hadSelection = builtOnce;
     var liveUrl = liveDepthGatherUrl();
     var options = [
       { label: 'Mock 本地', url: MOCK_URL, mock: true },
@@ -151,6 +168,7 @@
         break;
       }
     }
+    builtOnce = true;
     updateBanner();
   }
 
@@ -185,7 +203,7 @@
   function applyConfig(c) {
     cfg = c;
     var query = parseQuery();
-    var preferMock = query.mock === '1' || query.mock === 'true';
+    var preferMock = preferMockDefault();
 
     if (query.symbol_id) {
       cfg.defaults = cfg.defaults || {};

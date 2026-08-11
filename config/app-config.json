@@ -12,22 +12,26 @@
   "endpoints": {
     "depth": {
       "options": [
+        { "label": "Mock 本地", "url": "mock://depth" },
         { "label": "DEV1", "url": "https://contract.hxexchge.com/debug/depth" },
         { "label": "生产", "url": "https://contract.chishee.com/debug/depth" },
         { "label": "测试", "url": "http://18.177.36.184/futures/debug/depth" }
       ],
-      "default_index": 0
+      "default_index": 1,
+      "comment_default_index": "仅 ?mock=0 时生效；默认 mock 开启，config-loader 会自动选中 mock:// 项"
     },
     "depth_gather": {
       "options": [
+        { "label": "Mock 本地", "url": "mock://depthGather" },
         { "label": "生产", "url": "https://contract.chishee.com/debug/depthGather" },
         { "label": "测试", "url": "http://18.177.36.184/futures/debug/depthGather" }
       ],
-      "default_index": 1
+      "default_index": 2
     }
   },
   "mock": {
-    "enabled": false,
+    "enabled": true,
+    "comment_enabled": "默认 mock；?mock=0 关闭。GitHub Pages 上够不着内网接口，且 https 页面不能请求 http",
     "manifest": "../config/demo-mock.json",
     "depth_chat_manifest": "../depth-chat/data/mock/mock.json",
     "depth_gather_manifest": "../depth-gather/data/mock/mock.json",

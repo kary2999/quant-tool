@@ -92,6 +92,8 @@
       QuantToolsConfig.mock.enabled = cb.checked;
       if (window.QuantToolsConfigLoader && QuantToolsConfigLoader.installMockAjax) {
         QuantToolsConfigLoader.installMockAjax(QuantToolsConfig);
+        // 取消勾选后下拉要从 mock:// 切回真实地址，否则请求打不出去
+        QuantToolsConfigLoader.applyDepthEndpointSelect(QuantToolsConfig, 'market_monitor');
       }
       MMDepth.refresh();
     });
@@ -154,11 +156,21 @@
     });
   }
 
-  document.addEventListener('quant-tools-config-ready', function (ev) {
+  function onConfigReady(cfg) {
     window.MMApp = {
       reloadBoxData: function () { return loadData(defaultDataFile); },
       getStore: function () { return store; }
     };
-    start(ev.detail || {});
-  });
+    start(cfg || {});
+  }
+
+  // config-loader 是在 window 上派发的事件，挂到 document 收不到（CustomEvent 默认不冒泡）。
+  // 另外兜一层：配置若已经加载完，直接起，避免错过事件。
+  if (window.QuantToolsConfig) {
+    onConfigReady(window.QuantToolsConfig);
+  } else {
+    window.addEventListener('quant-tools-config-ready', function (ev) {
+      onConfigReady(ev.detail);
+    }, { once: true });
+  }
 })();

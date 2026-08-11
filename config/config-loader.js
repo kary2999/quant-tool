@@ -51,16 +51,20 @@
     return global.QUANT_TOOLS_MOCK && global.QUANT_TOOLS_MOCK.config;
   }
 
+  /**
+   * 默认走 mock。理由：本页要发布到 GitHub Pages，
+   * 公网既够不着内网接口，https 页面也不允许请求 http（混合内容）。
+   * 要真接口：URL 加 ?mock=0，或页面上取消勾选「使用 Mock」。
+   */
+  function preferMockDefault() {
+    var q = parseQuery();
+    return !(q.mock === '0' || q.mock === 'false');
+  }
+
   function applyQueryOverrides(cfg) {
     var query = parseQuery();
-    if (query.mock === '1' || query.mock === 'true') {
-      cfg.mock = cfg.mock || {};
-      cfg.mock.enabled = true;
-    }
-    if (isFileProtocol()) {
-      cfg.mock = cfg.mock || {};
-      cfg.mock.enabled = true;
-    }
+    cfg.mock = cfg.mock || {};
+    cfg.mock.enabled = preferMockDefault();
     if (query.symbol_id) {
       cfg.defaults = cfg.defaults || {};
       cfg.defaults.symbol_id = query.symbol_id;
@@ -126,12 +130,21 @@
 
     if (!ep || !ep.options || !ep.options.length) return;
 
+    // mock 开启时优先选中 mock:// 项，关闭时回到配置里的 default_index，
+    // 免得取消勾选后下拉还停在 mock:// 这个打不通的地址上。
+    var wantIdx = ep.default_index || 0;
+    if (cfg.mock && cfg.mock.enabled) {
+      for (var i = 0; i < ep.options.length; i++) {
+        if (/^mock:\/\//.test(ep.options[i].url)) { wantIdx = i; break; }
+      }
+    }
+
     sel.innerHTML = '';
     ep.options.forEach(function (opt, idx) {
       var o = document.createElement('option');
       o.value = opt.url;
       o.textContent = opt.label;
-      if (idx === (ep.default_index || 0)) o.selected = true;
+      if (idx === wantIdx) o.selected = true;
       sel.appendChild(o);
     });
   }
@@ -155,13 +168,14 @@
 
   /** mock 模式下包装 $.ajax，命中 contract.chishee.com 相关接口时走本地 JSON */
   function installMockAjax(cfg) {
-    if (!cfg.mock || !cfg.mock.enabled || !global.jQuery) return;
+    if (!global.jQuery) return;
     var $ = global.jQuery;
     if ($.ajax.__quantMockInstalled) return;
 
     var orig = $.ajax.bind($);
     var mockMap = [
       { test: /depthGather/, key: 'depth_gather', fallback: 'depthGather.default.json' },
+      { test: /^mock:\/\/depth(\?|$)/, key: 'depth', fallback: 'depth.default.json' },
       { test: /\/debug\/depth(\?|$)/, key: 'depth', fallback: 'depth.default.json' },
       { test: /exchangeInfo/, key: 'exchangeInfo' },
       { test: /tickerList/, key: 'tickerList' },
@@ -170,6 +184,10 @@
     ];
 
     $.ajax = function (opts) {
+      // 每次请求实时读开关：装一次即可，勾选框来回切都生效
+      var live = global.QuantToolsConfig || cfg;
+      if (!live.mock || !live.mock.enabled) return orig(opts);
+
       var url = typeof opts === 'string' ? opts : (opts && opts.url);
       if (!url) return orig(opts);
 
