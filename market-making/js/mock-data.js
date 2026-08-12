@@ -113,19 +113,19 @@
           { box_id: 7, pid: 1, direction: -1, dom: 7, trust_num: 30, price_float: '103-105', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
           { box_id: 8, pid: 1, direction: -1, dom: 8, trust_num: 30, price_float: '105-110', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
           { box_id: 9, pid: 1, direction: -1, dom: 9, trust_num: 30, price_float: '110-120', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
-          { box_id: 10, pid: 1, direction: 1, dom: 1, trust_num: 10, price_float: '99.995-99.7', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
-          { box_id: 11, pid: 1, direction: 1, dom: 2, trust_num: 10, price_float: '99.7-99.5', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
-          { box_id: 12, pid: 1, direction: 1, dom: 3, trust_num: 10, price_float: '99.5-99.2', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
-          { box_id: 13, pid: 1, direction: 1, dom: 4, trust_num: 10, price_float: '99.2-98.8', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
-          { box_id: 14, pid: 1, direction: 1, dom: 5, trust_num: 10, price_float: '98.8-98', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
-          { box_id: 15, pid: 1, direction: 1, dom: 6, trust_num: 30, price_float: '98-97', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
-          { box_id: 16, pid: 1, direction: 1, dom: 7, trust_num: 30, price_float: '97-95', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
-          { box_id: 17, pid: 1, direction: 1, dom: 8, trust_num: 30, price_float: '95-90', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
-          { box_id: 18, pid: 1, direction: 1, dom: 9, trust_num: 30, price_float: '90-80', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 }
+          { box_id: 10, pid: 1, direction: 1, dom: 1, trust_num: 10, price_float: '99.7-99.995', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
+          { box_id: 11, pid: 1, direction: 1, dom: 2, trust_num: 10, price_float: '99.5-99.7', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
+          { box_id: 12, pid: 1, direction: 1, dom: 3, trust_num: 10, price_float: '99.2-99.5', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
+          { box_id: 13, pid: 1, direction: 1, dom: 4, trust_num: 10, price_float: '98.8-99.2', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
+          { box_id: 14, pid: 1, direction: 1, dom: 5, trust_num: 10, price_float: '98-98.8', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
+          { box_id: 15, pid: 1, direction: 1, dom: 6, trust_num: 30, price_float: '97-98', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
+          { box_id: 16, pid: 1, direction: 1, dom: 7, trust_num: 30, price_float: '95-97', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
+          { box_id: 17, pid: 1, direction: 1, dom: 8, trust_num: 30, price_float: '90-95', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 },
+          { box_id: 18, pid: 1, direction: 1, dom: 9, trust_num: 30, price_float: '80-90', number_float: '10000-10000', change_trust_num: 0, change_number_float: '1-100', change_survival_time: '3-10', status: 1 }
         ],
         '2': [
           { box_id: 101, pid: 2, direction: -1, dom: 1, trust_num: 15, price_float: '100.01-100.2', number_float: '500-2000', change_trust_num: 1, change_number_float: '10-100', change_survival_time: '5-15', status: 1 },
-          { box_id: 102, pid: 2, direction: 1, dom: 1, trust_num: 15, price_float: '99.99-99.8', number_float: '500-2000', change_trust_num: 1, change_number_float: '10-100', change_survival_time: '5-15', status: 1 }
+          { box_id: 102, pid: 2, direction: 1, dom: 1, trust_num: 15, price_float: '99.8-99.99', number_float: '500-2000', change_trust_num: 1, change_number_float: '10-100', change_survival_time: '5-15', status: 1 }
         ]
       },
       active_pid: 1
