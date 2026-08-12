@@ -56,3 +56,18 @@ body.skin-blue { background: #ecf0f5; font-size: 13px; }
 .preview-row { margin-bottom: 0; }
 
 .btn-edit-row { padding: 2px 8px; }
+
+.box-warn { color: #f39c12; cursor: help; margin-left: 2px; }
+.preview-warn { margin-top: 6px; color: #f39c12; }
+
+/* 订单簿式分组：卖盘在上、买盘在下，盘口居中 */
+#box_table .row-group td { font-size: 12px; font-weight: 600; padding: 6px 10px; border-top: 2px solid #ddd; }
+#box_table .group-sell td { background: #fdf3f2; color: #c0392b; }
+#box_table .group-buy td { background: #f1f9f4; color: #1d8348; }
+#box_table .row-spread td {
+  background: #f5f7fa; color: #34495e; font-size: 12px; text-align: center;
+  padding: 8px 10px; border-top: 2px solid #bdc3c7; border-bottom: 2px solid #bdc3c7;
+}
+#box_table .row-spread.crossed td { background: #fcf0e6; color: #c0392b; font-weight: 600; }
+#box_table .row-sell td:nth-child(2) { border-left: 3px solid #e8b0aa; }
+#box_table .row-buy td:nth-child(2) { border-left: 3px solid #9fd8b6; }
