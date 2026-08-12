@@ -14,6 +14,12 @@
     return parseFloat(Number(value).toFixed(20));
   }
 
+  /** 张数换算走十进制，避免 15000 × 0.001 × 66501.1 显示成 997516.5000000001 */
+  function decMul(a, b) {
+    var s = MMCalculation.sbcmul(String(a == null ? 0 : a), String(b == null ? 0 : b), 10);
+    return s.indexOf('.') >= 0 ? s.replace(/0+$/, '').replace(/\.$/, '') : s;
+  }
+
   function statusToggle(row, field, yes, no) {
     var value = row[field];
     var on = parseInt(value, 10) === yes;
@@ -54,14 +60,12 @@
   }
 
   function moveQtyFmt(val, row) {
-    var cVolume = val * row.contract_value;
-    return '<span class="red">' + precisionToFixed(cVolume) + '</span>';
+    return '<span class="red">' + decMul(val, row.contract_value) + '</span>';
   }
 
   function moveAmountFmt(val, row) {
-    var cVolume = row.move_position_qty * row.contract_value;
-    var cAmount = precisionToFixed(cVolume * row.mark_price);
-    return '<span class="green">' + cAmount + 'U</span>';
+    var cVolume = decMul(row.move_position_qty, row.contract_value);
+    return '<span class="green">' + decMul(cVolume, row.mark_price) + 'U</span>';
   }
 
   function symbolFmt(value, row) {

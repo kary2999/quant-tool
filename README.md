@@ -96,6 +96,35 @@ chmod +x sync.sh start.sh
 | `min_number` / `max_number` | `number_float × contract_value`（张 → 标的量） |
 | `min_change_number` / `max_change_number` | `change_number_float × contract_value` |
 
+**两条容易踩坑的口径，改 `calculation.js` 前务必先看：**
+
+1. **全部走十进制定点（BigInt），不能用 `Number` 算。** PHP 侧是 bcmath，截断方向恒为「趋零」。
+   用 double 复刻会出真错，例如 `0.29` 截到 2 位会变成 `0.28`，负数用 `Math.floor` 还会比 bcmath 多减 1。
+2. **`price_float` 入库恒为「低-高」**，买卖都一样 —— 这是 `MxMarketMakingBox::edit()` 的硬校验
+   （买盘上界 ≤ 100、卖盘下界 ≥ 100、且 `min ≤ max`）。买盘写成 `99.995-99.7` 这种「由盘口向外」
+   的顺序会让 `price_num` 变成负数。页面参照 `quant_monitor/mm_app.js` 的做法会自动归一化并打告警角标，
+   但**数据本身仍应按低-高写**。
+
+**买卖方向语义（存储相同，读法相反）：**
+
+价格公式两侧完全一致（`mark × pct/100`），后端四处实现都没有方向分支。
+真正不同的是**近盘口的那一端是谁**：
+
+| | 挂单位置 | 近盘口端 | 远端 | 表格展示 |
+|---|---|---|---|---|
+| 买盘 `direction=1` | 盘口下方 | 区间**上界**（价高） | 区间下界 | `99.995% → 99.7%` |
+| 卖盘 `direction=-1` | 盘口上方 | 区间**下界**（价低） | 区间上界 | `100.005% → 100.3%` |
+
+`enrichBox` 因此额外给出 `near_price / far_price / near_pct / far_pct`；
+`min_price / max_price` 保留原名不动，方便和后台 quant-admin 页面逐字段对账。
+
+表格按订单簿布局：卖盘在上（远→近）、买盘在下（近→远），中间的盘口行由
+`MMCalculation.checkCross()` 计算，**卖盘最低价 ≤ 买盘最高价时判定为买卖重叠并标红**
+（这类跨行问题单行校验拦不住，已关闭的盒子不参与判定）。
+
+回归测试：`node market-making/test/calculation-test.js`
+（内含一份独立的 bcmath BigInt 参考实现，逐字段比对，共 245 项断言）
+
 **外部配置（接口挂掉时）：**
 
 编辑 `market-making/data/symbol-1000001.json`：
