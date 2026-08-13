@@ -5,12 +5,13 @@
 (function (global) {
   'use strict';
 
+  // [skill: code-review v2] 已自检 · 各所买卖分界线用独立 dashStyle，避免 5 条实线叠在一起分不清
   var EXCHANGE_META = {
-    local:   { label: '本所',   colorBid: '#10b981', colorAsk: '#ef4444', lineWidth: 2.2, zIndex: 5 },
-    binance: { label: 'Binance', colorBid: '#f0b90b', colorAsk: '#f0b90b', lineWidth: 1.2, zIndex: 4 },
-    okx:     { label: 'OKX',     colorBid: '#ffffff', colorAsk: '#ffffff', lineWidth: 1.2, zIndex: 3 },
-    bybit:   { label: 'Bybit',   colorBid: '#f7a600', colorAsk: '#f7a600', lineWidth: 1.2, zIndex: 2 },
-    kucoin:  { label: 'KuCoin',  colorBid: '#23af91', colorAsk: '#23af91', lineWidth: 1.2, zIndex: 1 }
+    local:   { label: '本所',    colorBid: '#10b981', colorAsk: '#ef4444', lineWidth: 2.4, zIndex: 5, dashStyle: 'Solid' },
+    binance: { label: 'Binance', colorBid: '#F0B90B', colorAsk: '#D4A017', lineWidth: 1.5, zIndex: 4, dashStyle: 'Dash' },
+    okx:     { label: 'OKX',     colorBid: '#58A6FF', colorAsk: '#388BFD', lineWidth: 1.4, zIndex: 3, dashStyle: 'ShortDash' },
+    bybit:   { label: 'Bybit',   colorBid: '#FF7043', colorAsk: '#E64A19', lineWidth: 1.4, zIndex: 2, dashStyle: 'Dot' },
+    kucoin:  { label: 'KuCoin',  colorBid: '#A371F7', colorAsk: '#8957E5', lineWidth: 1.4, zIndex: 1, dashStyle: 'DashDot' }
   };
 
   var bnTickCache = {};

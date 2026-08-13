@@ -78,6 +78,7 @@
         .ex-toggles input { margin: 0; }
         .ex-dot {
             width: 10px; height: 10px; border-radius: 2px; display: inline-block;
+            border: 1px solid rgba(255,255,255,0.15);
         }
 
         .status-bar {
@@ -143,6 +144,36 @@
         .cmp-table .best-row td { font-weight: 700; }
         .cmp-table tr:hover td { background: rgba(88, 166, 255, 0.08) !important; }
 
+        .zoom-bar {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
+            padding: 6px 12px; border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.15); font-size: 11px;
+        }
+        .zoom-bar .lbl { color: var(--dim); margin-right: 2px; }
+        .zoom-seg {
+            display: inline-flex; border: 1px solid var(--border);
+            border-radius: 4px; overflow: hidden;
+        }
+        .zoom-seg button {
+            border: none; background: transparent; color: var(--dim);
+            padding: 3px 8px; font-size: 11px; cursor: pointer;
+            border-right: 1px solid var(--border);
+        }
+        .zoom-seg button:last-child { border-right: none; }
+        .zoom-seg button:hover { background: rgba(88, 166, 255, 0.12); color: var(--text); }
+        .zoom-seg button.on { background: rgba(88, 166, 255, 0.22); color: var(--accent); font-weight: 600; }
+        .zoom-btns { display: inline-flex; gap: 4px; }
+        .zoom-btns button {
+            min-width: 28px; height: 24px; padding: 0 8px;
+            border: 1px solid var(--border); border-radius: 4px;
+            background: #1c2333; color: var(--text); font-size: 13px; cursor: pointer;
+        }
+        .zoom-btns button:hover { border-color: var(--accent); color: var(--accent); }
+        .zoom-btns button.on { background: rgba(88, 166, 255, 0.22); border-color: var(--accent); color: var(--accent); }
+        .zoom-hint { color: var(--dim); font-size: 10px; margin-left: auto; }
+        .cmp-table .spread-bp { font-variant-numeric: tabular-nums; }
+        .cmp-table .mid-cell { font-variant-numeric: tabular-nums; color: var(--dim); }
+
         @media (max-width: 991px) {
             .main-layout { flex-direction: column; }
             .side-panel { flex: none; max-width: 100%; width: 100%; }
@@ -193,6 +224,8 @@
                             <th>交易所</th>
                             <th>BP</th>
                             <th>AP</th>
+                            <th>Mid</th>
+                            <th>价差</th>
                             <th>档数</th>
                             <th>延迟</th>
                         </tr>
@@ -225,9 +258,34 @@
             <div class="chart-head">
                 <div>
                     <strong id="chart_title">多交易所深度位置对比</strong>
-                    <span class="dim" id="chart_sub">纵轴=价格 · 横轴=单档量 · 全部响应后统一渲染</span>
+                    <span class="dim" id="chart_sub">纵轴=价格 · 横轴=单档量 · 横虚线=各所买卖分界（mid）</span>
                 </div>
                 <span id="batch_info" class="dim">—</span>
+            </div>
+            <div class="zoom-bar">
+                <span class="lbl">价格范围</span>
+                <div class="zoom-seg" id="zoom_price_range">
+                    <button data-v="25" title="锚点 mid ±25 bps (0.25%)">0.25%</button>
+                    <button data-v="50" title="锚点 mid ±50 bps (0.5%)">0.5%</button>
+                    <button data-v="100" class="on" title="锚点 mid ±100 bps (1%)">1%</button>
+                    <button data-v="200" title="锚点 mid ±200 bps (2%)">2%</button>
+                    <button data-v="500" title="锚点 mid ±500 bps (5%)">5%</button>
+                    <button data-v="1000" title="锚点 mid ±1000 bps (10%)">10%</button>
+                    <button data-v="full" title="显示全部价位">全部</button>
+                </div>
+                <span class="lbl">缩放</span>
+                <div class="zoom-btns">
+                    <button type="button" id="zoom_box_toggle" title="开启后可在图表上框选缩放">框选</button>
+                    <button type="button" id="zoom_in" title="放大（缩小价格范围）">＋</button>
+                    <button type="button" id="zoom_out" title="缩小（扩大价格范围）">－</button>
+                    <button type="button" id="zoom_reset" title="重置缩放">重置</button>
+                </div>
+                <span class="lbl">单档量</span>
+                <div class="zoom-btns">
+                    <button type="button" id="vol_zoom_in" title="放大单档量轴">量＋</button>
+                    <button type="button" id="vol_zoom_out" title="缩小单档量轴">量－</button>
+                </div>
+                <span class="zoom-hint" id="zoom_status">Ctrl+滚轮缩放 · 点「框选」后可拖拽框选</span>
             </div>
             <div id="container"></div>
         </section>
@@ -240,6 +298,335 @@
     var visibleExchanges = { local: true, binance: true, okx: true, bybit: true, kucoin: true };
     var chartSeriesMap = {};
     var lastBatch = null;
+    var zoomBps = 100;
+    var zoomMode = 'bps';
+    var volZoomFactor = 1;
+    var userDragZoom = false;
+    var boxZoomEnabled = false;
+    var wheelAccum = 0;
+    var wheelLastApply = 0;
+    var ZOOM_PRICE_FACTOR_IN = 0.9;
+    var ZOOM_PRICE_FACTOR_OUT = 1.12;
+    var ZOOM_VOL_FACTOR = 1.18;
+    var WHEEL_ZOOM_THRESHOLD = 100;
+    var WHEEL_ZOOM_COOLDOWN_MS = 220;
+    var ANCHOR_PREF = ['binance', 'local', 'okx', 'bybit', 'kucoin'];
+    var spreadBandIds = [];
+    var spreadLineIds = [];
+
+    function getBookMid(r) {
+        if (!r || !r.ok || !r.stats) return null;
+        var bp = parseFloat(r.stats.bid_price);
+        var ap = parseFloat(r.stats.ask_price);
+        if (!(bp > 0) || !(ap > 0)) return null;
+        var mid = (bp + ap) / 2;
+        return {
+            bid: bp,
+            ask: ap,
+            mid: mid,
+            spread_bp: (ap - bp) / mid * 10000
+        };
+    }
+
+    function getAnchorKey(batch) {
+        if (!batch) return '';
+        for (var i = 0; i < ANCHOR_PREF.length; i++) {
+            var key = ANCHOR_PREF[i];
+            if (!visibleExchanges[key]) continue;
+            if (getBookMid(batch.results[key])) return key;
+        }
+        return '';
+    }
+
+    function getAnchorMid(batch) {
+        var key = getAnchorKey(batch);
+        if (!key) return 0;
+        return getBookMid(batch.results[key]).mid;
+    }
+
+    function hexToRgba(hex, alpha) {
+        var h = String(hex || '').replace('#', '');
+        if (h.length === 3) h = h.charAt(0) + h.charAt(0) + h.charAt(1) + h.charAt(1) + h.charAt(2) + h.charAt(2);
+        var n = parseInt(h, 16);
+        if (isNaN(n)) return 'rgba(88,166,255,' + alpha + ')';
+        return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + alpha + ')';
+    }
+
+    function getFullPriceRange(batch) {
+        var min = Infinity, max = -Infinity;
+        DepthCompare.EXCHANGE_KEYS.forEach(function (key) {
+            if (!visibleExchanges[key]) return;
+            var r = batch.results[key];
+            if (!r || !r.ok) return;
+            (r.asks || []).concat(r.bids || []).forEach(function (row) {
+                var p = parseFloat(row.price);
+                if (isNaN(p)) return;
+                if (p < min) min = p;
+                if (p > max) max = p;
+            });
+        });
+        if (!isFinite(min) || !isFinite(max)) return { min: 0, max: 0 };
+        var pad = (max - min) * 0.02 || 1;
+        return { min: min - pad, max: max + pad };
+    }
+
+    function computeMaxVolumeInRange(batch, xMin, xMax) {
+        var maxVol = 0;
+        DepthCompare.EXCHANGE_KEYS.forEach(function (key) {
+            if (!visibleExchanges[key]) return;
+            var r = batch.results[key];
+            if (!r || !r.ok) return;
+            (r.asks || []).concat(r.bids || []).forEach(function (row) {
+                var p = parseFloat(row.price);
+                var v = parseFloat(row.number) || 0;
+                if (p >= xMin && p <= xMax && v > maxVol) maxVol = v;
+            });
+        });
+        return maxVol || 1;
+    }
+
+    function updateZoomStatusLabel(xMin, xMax, mid, anchorKey) {
+        var el = document.getElementById('zoom_status');
+        if (!el) return;
+        var anchor = anchorKey && DepthCompare.EXCHANGE_META[anchorKey]
+            ? DepthCompare.EXCHANGE_META[anchorKey].label
+            : '—';
+        if (zoomMode === 'full') {
+            el.textContent = '全部价位 · 锚点 ' + anchor + ' · Ctrl+滚轮缩放';
+            return;
+        }
+        if (mid > 0 && xMax > xMin) {
+            var halfBps = ((xMax - xMin) / 2 / mid * 10000).toFixed(0);
+            el.textContent = '锚点 ' + anchor + ' mid=' + mid.toFixed(2) +
+                ' · ±' + halfBps + ' bps · Ctrl+滚轮缩放';
+        }
+    }
+
+    function clearSpreadMarkers() {
+        if (!chart || !chart.xAxis || !chart.xAxis[0]) return;
+        var axis = chart.xAxis[0];
+        spreadBandIds.forEach(function (id) { axis.removePlotBand(id); });
+        spreadLineIds.forEach(function (id) { axis.removePlotLine(id); });
+        spreadBandIds = [];
+        spreadLineIds = [];
+    }
+
+    function updateSpreadMarkers(batch) {
+        if (!chart || !chart.xAxis || !chart.xAxis[0]) return;
+        var axis = chart.xAxis[0];
+        clearSpreadMarkers();
+        if (!batch) return;
+        var decimals = batch.price_decimals != null ? batch.price_decimals : 2;
+        var idx = 0;
+        DepthCompare.EXCHANGE_KEYS.forEach(function (key) {
+            if (!visibleExchanges[key]) return;
+            var book = getBookMid(batch.results[key]);
+            if (!book) return;
+            var meta = DepthCompare.EXCHANGE_META[key];
+            var bandId = 'spread_band_' + key;
+            var lineId = 'spread_mid_' + key;
+            var lo = Math.min(book.bid, book.ask);
+            var hi = Math.max(book.bid, book.ask);
+            axis.addPlotBand({
+                id: bandId,
+                from: lo,
+                to: hi,
+                color: hexToRgba(meta.colorBid, 0.16),
+                zIndex: 1
+            });
+            axis.addPlotLine({
+                id: lineId,
+                value: book.mid,
+                color: meta.colorBid,
+                width: key === 'local' ? 2 : 1.25,
+                dashStyle: meta.dashStyle || 'Dash',
+                zIndex: 7,
+                label: {
+                    text: meta.label + ' ' + book.mid.toFixed(decimals) + '  ' +
+                        (book.spread_bp < 0 ? '交叉 ' : '') + Math.abs(book.spread_bp).toFixed(1) + 'bp',
+                    align: 'right',
+                    x: -6,
+                    y: 12 + idx * 13,
+                    style: {
+                        color: meta.colorBid,
+                        fontSize: '10px',
+                        fontWeight: key === 'local' ? '700' : '500'
+                    }
+                }
+            });
+            spreadBandIds.push(bandId);
+            spreadLineIds.push(lineId);
+            idx += 1;
+        });
+    }
+
+    function applyPriceAxis(xMin, xMax) {
+        var axis = chart.xAxis[0];
+        axis.update({
+            min: xMin,
+            max: xMax,
+            startOnTick: false,
+            endOnTick: false,
+            minPadding: 0,
+            maxPadding: 0,
+            minRange: 1e-8
+        }, false);
+        axis.setExtremes(xMin, xMax, false);
+    }
+
+    function applyChartZoom(batch, opts) {
+        opts = opts || {};
+        if (!batch || !chart || !chart.xAxis || !chart.xAxis[0]) return;
+
+        if (userDragZoom && !opts.force) {
+            updateSpreadMarkers(batch);
+            chart.redraw(false);
+            return;
+        }
+
+        var full = getFullPriceRange(batch);
+        var anchorKey = getAnchorKey(batch);
+        var mid = getAnchorMid(batch);
+        var xMin, xMax;
+
+        if (zoomMode === 'full' || !(mid > 0)) {
+            xMin = full.min;
+            xMax = full.max;
+        } else {
+            var halfPct = zoomBps / 10000;
+            xMin = mid * (1 - halfPct);
+            xMax = mid * (1 + halfPct);
+        }
+
+        if (!(xMax > xMin)) {
+            xMin = full.min;
+            xMax = full.max;
+        }
+
+        applyPriceAxis(xMin, xMax);
+        updateSpreadMarkers(batch);
+        applyVolZoom(xMin, xMax);
+        updateZoomStatusLabel(xMin, xMax, mid, anchorKey);
+        chart.redraw(false);
+    }
+
+    function chartZoomIn() {
+        userDragZoom = false;
+        if (zoomMode === 'full') {
+            zoomMode = 'bps';
+            zoomBps = 200;
+        } else {
+            zoomBps = Math.max(10, Math.round(zoomBps * ZOOM_PRICE_FACTOR_IN));
+        }
+        syncZoomPresetUI();
+        if (lastBatch) applyChartZoom(lastBatch, { force: true });
+    }
+
+    function chartZoomOut() {
+        userDragZoom = false;
+        if (zoomMode === 'full') return;
+        zoomBps = Math.min(5000, Math.round(zoomBps * ZOOM_PRICE_FACTOR_OUT));
+        if (zoomBps >= 800) zoomMode = 'full';
+        syncZoomPresetUI();
+        if (lastBatch) applyChartZoom(lastBatch, { force: true });
+    }
+
+    function chartResetZoom() {
+        userDragZoom = false;
+        zoomMode = 'bps';
+        zoomBps = 100;
+        volZoomFactor = 1;
+        syncZoomPresetUI();
+        if (lastBatch) applyChartZoom(lastBatch, { force: true });
+    }
+
+    function syncZoomPresetUI() {
+        document.querySelectorAll('#zoom_price_range button').forEach(function (btn) {
+            var v = btn.getAttribute('data-v');
+            var on = false;
+            if (v === 'full') on = zoomMode === 'full';
+            else if (zoomMode === 'bps') on = parseInt(v, 10) === zoomBps;
+            btn.classList.toggle('on', on);
+        });
+    }
+
+    function setBoxZoomEnabled(on) {
+        boxZoomEnabled = !!on;
+        var btn = document.getElementById('zoom_box_toggle');
+        if (btn) btn.classList.toggle('on', boxZoomEnabled);
+        if (chart) {
+            chart.update({ chart: { zoomType: boxZoomEnabled ? 'xy' : null } }, false);
+        }
+    }
+
+    function bindZoomControls() {
+        document.querySelectorAll('#zoom_price_range button').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                userDragZoom = false;
+                var v = btn.getAttribute('data-v');
+                if (v === 'full') {
+                    zoomMode = 'full';
+                } else {
+                    zoomMode = 'bps';
+                    zoomBps = parseInt(v, 10) || 50;
+                }
+                syncZoomPresetUI();
+                if (lastBatch) applyChartZoom(lastBatch, { force: true });
+            });
+        });
+        document.getElementById('zoom_in').addEventListener('click', chartZoomIn);
+        document.getElementById('zoom_out').addEventListener('click', chartZoomOut);
+        document.getElementById('zoom_reset').addEventListener('click', chartResetZoom);
+        document.getElementById('zoom_box_toggle').addEventListener('click', function () {
+            setBoxZoomEnabled(!boxZoomEnabled);
+        });
+        document.getElementById('vol_zoom_in').addEventListener('click', function () {
+            userDragZoom = false;
+            volZoomFactor = Math.min(20, volZoomFactor * ZOOM_VOL_FACTOR);
+            applyVolZoom();
+            if (chart) chart.redraw(false);
+        });
+        document.getElementById('vol_zoom_out').addEventListener('click', function () {
+            userDragZoom = false;
+            volZoomFactor = Math.max(0.2, volZoomFactor / ZOOM_VOL_FACTOR);
+            applyVolZoom();
+            if (chart) chart.redraw(false);
+        });
+
+        var container = document.getElementById('container');
+        container.addEventListener('wheel', function (e) {
+            if (!lastBatch) return;
+            if (!e.ctrlKey && !e.metaKey) return;
+            e.preventDefault();
+            wheelAccum += e.deltaY;
+            var now = Date.now();
+            if (now - wheelLastApply < WHEEL_ZOOM_COOLDOWN_MS) return;
+            if (Math.abs(wheelAccum) < WHEEL_ZOOM_THRESHOLD) return;
+            var direction = wheelAccum;
+            wheelLastApply = now;
+            wheelAccum = 0;
+            userDragZoom = false;
+            if (direction < 0) chartZoomIn();
+            else chartZoomOut();
+        }, { passive: false });
+    }
+
+    function applyVolZoom(xMin, xMax) {
+        if (!lastBatch || !chart || !chart.yAxis || !chart.yAxis[0]) return;
+        if (xMin == null || xMax == null) {
+            var xAxis = chart.xAxis[0];
+            xMin = xAxis.min;
+            xMax = xAxis.max;
+        }
+        if (xMin == null || xMax == null) {
+            var full = getFullPriceRange(lastBatch);
+            xMin = full.min;
+            xMax = full.max;
+        }
+        var baseVol = computeMaxVolumeInRange(lastBatch, xMin, xMax);
+        var halfVol = baseVol * 1.15 / Math.max(volZoomFactor, 0.1);
+        chart.yAxis[0].setExtremes(-halfVol, halfVol, false);
+    }
 
     function getSymCfg() {
         var sid = $('#symbol_id').val();
@@ -258,7 +645,10 @@
         $('#ex_toggles').html(html);
         $('#ex_toggles input').on('change', function () {
             visibleExchanges[$(this).data('ex')] = this.checked;
-            if (lastBatch) renderChart(lastBatch);
+            if (lastBatch) {
+                userDragZoom = false;
+                renderChart(lastBatch);
+            }
         });
     }
 
@@ -282,7 +672,15 @@
             inverted: true,
             backgroundColor: '#161b22',
             spacing: [12, 16, 12, 12],
-            animation: { duration: 300 }
+            animation: { duration: 300 },
+            zoomType: null,
+            events: {
+                selection: function (event) {
+                    if (!boxZoomEnabled) return false;
+                    if (event.xAxis || event.yAxis) userDragZoom = true;
+                    return true;
+                }
+            }
         },
         title: { text: null },
         credits: { enabled: false },
@@ -291,12 +689,21 @@
             gridLineWidth: 1,
             gridLineColor: 'rgba(48, 54, 61, 0.45)',
             lineColor: '#30363d',
+            startOnTick: false,
+            endOnTick: false,
+            minPadding: 0,
+            maxPadding: 0,
+            minRange: 1e-8,
             labels: { style: { color: '#8b949e', fontSize: '10px' } }
         },
         yAxis: {
             title: { text: '单档量 Per Level', style: { color: '#8b949e', fontSize: '11px' } },
             gridLineWidth: 0,
             lineColor: '#30363d',
+            startOnTick: false,
+            endOnTick: false,
+            minPadding: 0,
+            maxPadding: 0,
             labels: {
                 style: { color: '#8b949e', fontSize: '10px' },
                 formatter: function () { return Math.abs(this.value); }
@@ -338,7 +745,7 @@
     var chart = Highcharts.chart('container', depthObject);
 
     function initChartSeries() {
-        chart.series.slice().forEach(function (s) { s.remove(false); });
+        while (chart.series.length) chart.series[0].remove(false);
         chartSeriesMap = {};
         DepthCompare.EXCHANGE_KEYS.forEach(function (key) {
             var meta = DepthCompare.EXCHANGE_META[key];
@@ -361,34 +768,38 @@
                 color: meta.colorAsk,
                 lineWidth: meta.lineWidth,
                 zIndex: meta.zIndex,
-                dashStyle: key === 'local' ? 'Solid' : 'ShortDash',
                 visible: visibleExchanges[key],
                 data: []
             }, false);
-            chartSeriesMap[bidId] = chart.get(bidId);
-            chartSeriesMap[askId] = chart.get(askId);
+            chartSeriesMap[bidId] = chart.series[chart.series.length - 2];
+            chartSeriesMap[askId] = chart.series[chart.series.length - 1];
         });
         chart.redraw();
+    }
+
+    function getSeriesPair(key) {
+        var bid = chartSeriesMap[key + '_bid'] || chart.get(key + '_bid');
+        var ask = chartSeriesMap[key + '_ask'] || chart.get(key + '_ask');
+        return { bid: bid, ask: ask };
     }
 
     function renderChart(batch) {
         DepthCompare.EXCHANGE_KEYS.forEach(function (key) {
             var r = batch.results[key];
-            var meta = DepthCompare.EXCHANGE_META[key];
-            var bidSeries = chart.get(key + '_bid');
-            var askSeries = chart.get(key + '_ask');
-            if (!bidSeries || !askSeries) return;
-            bidSeries.update({ visible: visibleExchanges[key] }, false);
-            askSeries.update({ visible: visibleExchanges[key] }, false);
+            var pair = getSeriesPair(key);
+            if (!pair.bid || !pair.ask) return;
+            pair.bid.update({ visible: visibleExchanges[key] }, false);
+            pair.ask.update({ visible: visibleExchanges[key] }, false);
             if (r && r.ok) {
-                bidSeries.setData(DepthCompare.levelsToSeries(r.bids, -1), false);
-                askSeries.setData(DepthCompare.levelsToSeries(r.asks, 1), false);
+                pair.bid.setData(DepthCompare.levelsToSeries(r.bids, -1), false);
+                pair.ask.setData(DepthCompare.levelsToSeries(r.asks, 1), false);
             } else {
-                bidSeries.setData([], false);
-                askSeries.setData([], false);
+                pair.bid.setData([], false);
+                pair.ask.setData([], false);
             }
         });
-        chart.redraw();
+        userDragZoom = false;
+        applyChartZoom(batch, { force: true });
     }
 
     function renderStatusBar(batch) {
@@ -416,11 +827,19 @@
             if (!r) return;
             var bp = r.ok ? r.stats.bid_price : '—';
             var ap = r.ok ? r.stats.ask_price : '—';
+            var book = r.ok ? getBookMid(r) : null;
+            var midTxt = book ? book.mid.toFixed(batch.price_decimals || 2) : '—';
+            var sprTxt = book
+                ? (book.spread_bp < 0 ? '交叉 ' : '') + Math.abs(book.spread_bp).toFixed(2) + 'bp'
+                : '—';
             var lv = r.ok ? (r.stats.bid_levels + '/' + r.stats.ask_levels) : '—';
             var lat = r.ok ? r.latency_ms + 'ms' : '<span class="err">' + (r.error || 'fail') + '</span>';
             var cls = key === 'local' ? 'best-row' : '';
             rows += '<tr class="' + cls + '"><td>' + meta.label + '</td><td class="green">' + bp +
-                '</td><td class="red">' + ap + '</td><td>' + lv + '</td><td>' + lat + '</td></tr>';
+                '</td><td class="red">' + ap +
+                '</td><td class="mid-cell">' + midTxt +
+                '</td><td class="spread-bp">' + sprTxt +
+                '</td><td>' + lv + '</td><td>' + lat + '</td></tr>';
         });
         $('#best_cmp_body').html(rows);
     }
@@ -509,6 +928,7 @@
 
     $(function () {
         buildExchangeToggles();
+        bindZoomControls();
         initChartSeries();
         if (window.ResizeObserver) {
             new ResizeObserver(syncChartSize).observe(document.getElementById('container'));
