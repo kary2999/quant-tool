@@ -6,17 +6,15 @@
 
     <!-- 关键依赖 defer 加载（不阻塞 HTML 解析，骨架可立即渲染） -->
     <link rel="preconnect" href="https://code.jquery.com">
-    <link rel="preconnect" href="https://static.topcreditbank.com">
+    <link rel="preconnect" href="https://unpkg.com">
     <script defer src="https://code.jquery.com/jquery-3.6.4.min.js"
             integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
     <!-- quant-visual-tools-mock-hooks: 配置变量 + mock 桥接（sync 后保留） -->
     <script defer src="js/mock-data.js"></script>
     <script defer src="js/api-config.js"></script>
     <script defer src="js/mock-bridge.js"></script>
-    <script defer src="https://static.topcreditbank.com/2023/0719/highcharts.js"></script>
-    <script defer src="https://static.topcreditbank.com/2023/0719/exporting.js"></script>
-    <script defer src="https://static.topcreditbank.com/2023/0719/zh_cn-1.4.0.min.js"></script>
-    <script defer src="https://static.topcreditbank.com/2023/0719/w72sHD1689763738672.js"></script>
+    <script defer src="https://unpkg.com/highcharts@10.3.3/highcharts.js"></script>
+    <script defer src="https://unpkg.com/highcharts@10.3.3/modules/exporting.js"></script>
     <!-- ECharts 体积大，懒加载到 K 线首次展开时再注入 -->
     <!-- echarts.min.js 在 timeGetKline 内按需加载 -->
 
